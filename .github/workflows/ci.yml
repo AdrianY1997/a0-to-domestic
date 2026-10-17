@@ -41,15 +41,22 @@ jobs:
           cache-to: type=gha,scope=dev,mode=max
       - name: Lint, types and tests
         run: |
-          docker run --rm -v "$PWD/backend:/app/backend" -v "$PWD/fixtures:/app/fixtures:ro" \
+          # The checkout belongs to the runner UID, not to the image's app (10001): run as the runner
+          # user and send every cache/coverage/hypothesis write to /tmp (world-writable, not the mount).
+          docker run --rm --user "$(id -u):$(id -g)" \
+            -e HOME=/tmp/home -e XDG_CACHE_HOME=/tmp/cache -e RUFF_CACHE_DIR=/tmp/ruff \
+            -e COVERAGE_FILE=/tmp/.coverage -e HYPOTHESIS_STORAGE_DIRECTORY=/tmp/hypothesis \
+            -v "$PWD/backend:/app/backend" -v "$PWD/fixtures:/app/fixtures:ro" \
             -w /app/backend a0td:dev sh -c '
               ruff check . &&
               ruff format --check . &&
-              mypy src/a0td/domain src/a0td/render &&
-              pytest -q --cov=a0td --cov-report=term-missing:skip-covered'
+              mypy --cache-dir=/tmp/mypy src/a0td/domain src/a0td/render &&
+              pytest -p no:cacheprovider -q --cov=a0td --cov-report=term-missing:skip-covered'
       - name: pip-audit
         run: |
-          docker run --rm -v "$PWD/backend:/app/backend" -w /app/backend a0td:dev sh -c '
+          docker run --rm --user "$(id -u):$(id -g)" \
+            -e HOME=/tmp/home -e XDG_CACHE_HOME=/tmp/cache \
+            -v "$PWD/backend:/app/backend" -w /app/backend a0td:dev sh -c '
             uv export --frozen --no-dev --no-emit-project -o /tmp/requirements.txt >/dev/null &&
             uvx pip-audit --requirement /tmp/requirements.txt --no-deps --disable-pip'
 
@@ -173,7 +180,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
       - name: Playwright against the hardened full image
-        run: docker compose -f compose.dev.yml --profile e2e run --rm e2e
+        run: |
+          # The e2e named volume for node_modules is created root-owned; hand it to the runner UID first.
+          docker run --rm --user 0:0 -v a0td-dev_e2e-node-modules:/v --entrypoint chown \
+            mcr.microsoft.com/playwright:v1.55.0-noble -R "$(id -u):$(id -g)" /v
+          docker compose -f compose.dev.yml --profile e2e run --rm --user "$(id -u):$(id -g)" \
+            -e HOME=/tmp/home -e XDG_CACHE_HOME=/tmp/cache e2e
       - name: Container smoke test (slim / full / dev)
         run: bash scripts/container-smoke.sh
       - name: Collect Playwright reports
