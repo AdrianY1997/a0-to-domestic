@@ -1,0 +1,32 @@
+
+# recall (derived + personal layer)
+.recall/local/
+.recall/index.json
+.recall/usage.json
+
+# spike (throwaway)
+spike/
+**/.venv/
+**/node_modules/
+frontend/dist/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.playwright-mcp/
+*.log
+.env
+.env.*
+data/
+/tmp/
+e2e/test-results/
+e2e/playwright-report/
+.coverage
+htmlcov/
+backend/_mine.sh
+
+# local Claude Code tooling (absolute local paths)
+.claude/
+spike/

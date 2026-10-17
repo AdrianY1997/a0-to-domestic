@@ -1,0 +1,871 @@
+{
+  "app": {
+    "name": "a0-to-domestic"
+  },
+  "nav": {
+    "home": "Home",
+    "printers": "Printers",
+    "presets": "Presets",
+    "history": "History",
+    "help": "Help",
+    "settings": "Settings",
+    "main": "Main navigation"
+  },
+  "header": {
+    "language": "Language",
+    "toggleTheme": "Toggle light/dark theme",
+    "logout": "Sign out"
+  },
+  "lang": {
+    "es": "Español",
+    "en": "English"
+  },
+  "pages": {
+    "home": {
+      "title": "Home",
+      "description": "Upload a document to get started."
+    },
+    "editor": {
+      "title": "Editor",
+      "description": "Document {{id}}"
+    },
+    "result": {
+      "title": "Result",
+      "description": "Job {{id}}"
+    },
+    "printers": {
+      "title": "Printers",
+      "description": "Printer profiles."
+    },
+    "calibrate": {
+      "title": "Calibration",
+      "description": "Printer {{id}}"
+    },
+    "presets": {
+      "title": "Presets",
+      "description": "Built-in and user presets."
+    },
+    "history": {
+      "title": "History",
+      "description": "Documents and jobs."
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Language, units and defaults."
+    },
+    "help": {
+      "title": "Help",
+      "description": "How to print at 100 % and assemble the sheets."
+    },
+    "login": {
+      "title": "Sign in",
+      "description": "Sign in to continue."
+    },
+    "notFound": {
+      "title": "Page not found",
+      "description": "The route does not exist."
+    }
+  },
+  "common": {
+    "placeholder": "Coming soon.",
+    "error": "Error",
+    "close": "Close",
+    "cancel": "Cancel",
+    "backHome": "Back to home"
+  },
+  "orientation": {
+    "auto": "automatic",
+    "portrait": "portrait",
+    "landscape": "landscape"
+  },
+  "errors": {
+    "INTERNAL_ERROR": "Internal server error. Retry; if it persists, check the server logs.",
+    "UNKNOWN": "An unexpected error occurred. Please try again.",
+    "NETWORK_ERROR": "Could not reach the server. Check your connection and try again.",
+    "UNSUPPORTED_FORMAT": "Unsupported format. Try one of the formats in the list.",
+    "FORMAT_NOT_AVAILABLE_IN_IMAGE": "This format is not available in this application image. Convert the file to PDF or use the full image.",
+    "FILE_TOO_LARGE": "The file exceeds the {{max_mb}} MB limit. Reduce its size or split it.",
+    "TOO_MANY_PAGES": "The document has too many pages. Upload only the ones you need.",
+    "PIXEL_LIMIT_EXCEEDED": "The image has too many pixels. Reduce its resolution and upload it again.",
+    "PAGE_TOO_LARGE": "The page is too large. Reduce its size and upload it again.",
+    "PASSWORD_REQUIRED": "The document is password protected. Enter the password to continue.",
+    "PASSWORD_INVALID": "The password is not correct. Try again.",
+    "PRINT_NOT_ALLOWED": "The document forbids printing and cannot be processed.",
+    "CORRUPT_FILE": "The file is damaged and could not be opened. Try exporting it again from its program.",
+    "CONVERSION_FAILED": "The file could not be converted. Try saving it as PDF and upload it again.",
+    "CONVERSION_TIMEOUT": "The conversion took too long. Try a simpler file.",
+    "INVALID_SETTINGS": "Some setting is not valid. Check the highlighted values.",
+    "OVERLAP_TOO_LARGE": "The overlap is too large for this paper. Reduce it or use a larger paper.",
+    "CONTENT_AREA_TOO_SMALL": "The printable area of the sheet is too small. Reduce the margins or pick another paper.",
+    "SCALE_OUT_OF_RANGE": "The resulting scale is outside the allowed range (1 % to 1000 %).",
+    "TOO_MANY_SHEETS": "The result would need too many sheets. Reduce the scale or use a larger paper.",
+    "DOCUMENT_NOT_READY": "The document is not ready yet. Wait for processing to finish.",
+    "NOT_FOUND": "The resource was not found. It may have expired; go back home and upload it again.",
+    "JOB_CANCELLED": "The job was cancelled.",
+    "INTERRUPTED": "The job was interrupted. Generate it again.",
+    "PRINTER_UNREACHABLE": "The printer could not be reached.",
+    "AUTH_REQUIRED": "You must sign in to continue.",
+    "RENDER_UNAVAILABLE": "The exact sheet preview is not available on this server.",
+    "CALIBRATION_OUT_OF_RANGE": "The scale factor ({{kx}} × {{ky}}) is outside {{min}}–{{max}}. The page was probably printed with \"Fit to page\"; print at 100 % and measure again.",
+    "PRINTER_READONLY": "Built-in profiles cannot be modified. Duplicate it to get your own profile.",
+    "PRESET_READONLY": "Built-in presets cannot be modified. Save a copy as your own preset.",
+    "INVALID_CREDENTIALS": "Wrong password.",
+    "RATE_LIMITED": "Too many attempts. Wait a minute and try again.",
+    "CSRF_INVALID": "Your session security token is invalid. Reload the page and try again.",
+    "PRINT_REJECTED": "The printer refused or aborted the job. Check its status (paper, ink, supported formats).",
+    "IPP_DISABLED": "Direct printing is disabled on this server (A0TD_ENABLE_IPP).",
+    "DISCOVERY_UNAVAILABLE": "Printer discovery is not available here. Type the printer address by hand."
+  },
+  "document": {
+    "status": {
+      "processing": "Processing…",
+      "password_required": "Password required",
+      "ready": "Ready",
+      "failed": "Error"
+    },
+    "kind": {
+      "vector": "Vector",
+      "raster": "Image",
+      "mixed": "Mixed"
+    },
+    "failed": "The document could not be processed",
+    "supportedFormats": "Supported formats: {{formats}}."
+  },
+  "home": {
+    "title": "Print large plans on small sheets",
+    "subtitle": "Upload a plan, pattern or image and get a PDF of marked sheets to assemble.",
+    "dropzone": {
+      "label": "File drop zone",
+      "title": "Drag your files here or click to choose them",
+      "hint": "You can upload several at once; each one is a document.",
+      "limit": "Up to {{mb}} MB per file.",
+      "keyboard": "With the keyboard: focus this area and press Enter."
+    },
+    "uploads": {
+      "title": "Uploads",
+      "clear": "Clear list",
+      "progress": "Upload progress of {{name}}",
+      "done": "Uploaded ({{size}} MB)",
+      "open": "Open"
+    },
+    "presets": {
+      "title": "Quick start with a preset",
+      "hint": "Pick a preset, then upload your file: it is applied automatically.",
+      "none": "No preset"
+    },
+    "formats": {
+      "title": "Supported formats",
+      "more": "The type is detected from the file content, not its extension."
+    },
+    "recent": {
+      "title": "Recent documents",
+      "empty": "There are no documents yet.",
+      "delete": "Delete {{name}}"
+    }
+  },
+  "editor": {
+    "preview": "Preview",
+    "document": {
+      "title": "Document",
+      "nonStandard": "Non-standard size",
+      "dpi": "{{dpi}} DPI",
+      "page": "Page",
+      "pageOf": "{{n}}/{{total}} · {{size}}",
+      "setSize": "Set the real size…"
+    },
+    "warnings": {
+      "none": "No warnings.",
+      "title": "Warnings ({{count}})"
+    },
+    "sheetList": {
+      "title": "Sheet list ({{count}})",
+      "open": "Exact preview of sheet {{id}}",
+      "printIndex": "sheet {{k}}"
+    },
+    "sheetState": {
+      "printed": "will print",
+      "blank": "blank, skipped",
+      "deselected": "excluded"
+    },
+    "sheetAria": "Sheet {{id}}, {{state}}. Press Enter for the exact preview.",
+    "sheetTitle": "Sheet {{id}} (double-click: exact preview)",
+    "tool": {
+      "label": "Tool",
+      "pan": "Move",
+      "grid": "Grid",
+      "region": "Region",
+      "hint": {
+        "pan": "Drag to pan. Click a sheet to include or exclude it.",
+        "grid": "Drag to shift the grid within the available slack.",
+        "region": "Drag to draw the part of the document you want to print."
+      }
+    },
+    "tools": {
+      "title": "Tiling",
+      "sheets": {
+        "label": "Reprint sheets",
+        "hint": "Example: A1, B3-B5. Empty = all. You can also click the sheets.",
+        "placeholder": "All sheets",
+        "invalid": "Unknown sheets: {{ids}}",
+        "count": "{{chosen}} of {{total}} sheets included",
+        "all": "All",
+        "none": "None"
+      },
+      "offset": {
+        "label": "Grid offset",
+        "x": "Horizontal",
+        "y": "Vertical",
+        "hint": "Use the Grid tool to drag.",
+        "reset": "Center"
+      },
+      "region": {
+        "label": "Region",
+        "none": "The whole page is printed.",
+        "x": "X",
+        "y": "Y",
+        "width": "Width",
+        "height": "Height",
+        "draw": "Draw region",
+        "clear": "Clear region"
+      },
+      "autoTrim": {
+        "label": "Auto-trim",
+        "hint": "Fits the area to the content and drops empty borders."
+      }
+    },
+    "alternatives": {
+      "title": "Alternatives",
+      "show": "Show",
+      "hide": "Hide",
+      "loading": "Computing alternatives…",
+      "empty": "No alternatives for this document.",
+      "scale": "Sheets needed at the same scale ({{scale}})",
+      "paper": "Paper",
+      "cell": "{{sheets}} ({{cols}}×{{rows}})",
+      "apply": "Use {{paper}} {{orientation}}: {{sheets}} sheets",
+      "savings": "Save sheets by lowering the scale slightly",
+      "saving": "{{scale}}: {{sheets}} sheets (saves {{saved}})"
+    },
+    "overlay": {
+      "label": "Grid of {{cols}} × {{rows}} sheets, {{sheets}} to print",
+      "toggles": "Preview layers",
+      "margins": "Margins",
+      "overlaps": "Overlaps",
+      "ids": "IDs",
+      "hint": "Double-click a sheet to see its exact preview."
+    },
+    "zoom": {
+      "label": "Preview zoom",
+      "out": "Zoom out",
+      "in": "Zoom in",
+      "fit": "Fit"
+    },
+    "settings": {
+      "title": "Settings",
+      "preset": "Preset",
+      "presetPlaceholder": "Custom settings"
+    },
+    "summary": {
+      "planError": "The tiling could not be calculated",
+      "noSheets": "With these settings there is no sheet to print.",
+      "sheets_one": "{{count}} {{paper}} sheet, {{orientation}}",
+      "sheets_other": "{{count}} {{paper}} sheets, {{orientation}}",
+      "blank_one": "{{count}} blank skipped",
+      "blank_other": "{{count}} blank skipped",
+      "calculating": "Calculating…",
+      "testSheet": "Test sheet",
+      "generate": "Generate"
+    }
+  },
+  "warnings": {
+    "ignore": "Ignore",
+    "action": {
+      "reduceScale": "Reduce scale",
+      "fitSheet": "Shrink to one sheet",
+      "setPhysicalSize": "Set size",
+      "useCropBox": "Use the crop box"
+    },
+    "LOW_DPI": {
+      "title": "Low resolution",
+      "message": "At this scale the effective resolution is {{dpi}} DPI; the print may look pixelated."
+    },
+    "VERY_LOW_DPI": {
+      "title": "Very low resolution",
+      "message": "The effective resolution is only {{dpi}} DPI; the print will look very pixelated."
+    },
+    "PHYSICAL_SIZE_ASSUMED": {
+      "title": "Assumed physical size",
+      "message": "The image does not state its real size, so one was assumed. Tell us what size it represents to print it to scale."
+    },
+    "NONSTANDARD_SIZE": {
+      "title": "Non-standard size",
+      "message": "The page size does not match any standard format."
+    },
+    "SMALL_TEXT": {
+      "title": "Small text",
+      "message": "At this scale the text may be too small to read."
+    },
+    "THIN_LINES": {
+      "title": "Very thin lines",
+      "message": "At this scale some lines will be thinner than 0.1 mm and may not print."
+    },
+    "MANY_SHEETS": {
+      "title": "Many sheets",
+      "message": "More than 50 sheets are needed. Check the scale and the paper."
+    },
+    "FONTS_SUBSTITUTED": {
+      "title": "Fonts substituted",
+      "message": "Some fonts were not available and were replaced; the look may differ."
+    },
+    "ANNOTATIONS_FLATTENED": {
+      "title": "Annotations flattened",
+      "message": "Annotations and form fields have been merged into the drawing."
+    },
+    "LAYERS_PRESENT": {
+      "title": "Layers present",
+      "message": "The document has layers; they print as currently visible."
+    },
+    "LAYERS_RASTERIZED": {
+      "title": "Layers rasterized",
+      "message": "Layers changed state, so the output was rendered as images to make sure hidden content is not printed."
+    },
+    "DARK_BACKGROUND": {
+      "title": "Dark background",
+      "message": "The document has a dark background and will use a lot of ink."
+    },
+    "PDF_REPAIRED": {
+      "title": "PDF repaired",
+      "message": "The PDF was damaged and has been repaired automatically. Check the result."
+    },
+    "LOW_FIDELITY_FORMAT": {
+      "title": "Approximate conversion",
+      "message": "This format is converted with some loss of fidelity. Compare the preview with the original."
+    },
+    "BOX_FALLBACK": {
+      "title": "Box not available",
+      "message": "The chosen page box does not exist in this document; the crop box is used."
+    }
+  },
+  "settings": {
+    "sections": {
+      "paper": "Paper",
+      "scale": "Scale",
+      "tiling": "Tiling",
+      "marks": "Marks",
+      "output": "Output"
+    },
+    "printer": {
+      "label": "Printer"
+    },
+    "paper": {
+      "label": "Paper",
+      "custom": "Custom",
+      "width": "Width",
+      "height": "Height",
+      "banner": "Roll / banner",
+      "rollWidth": "Roll width",
+      "rollMaxLength": "Maximum length",
+      "rollHint": "One column of sheets per roll width; each sheet is cut to the length it needs (never longer than the maximum)."
+    },
+    "orientation": {
+      "label": "Orientation",
+      "auto": "Auto",
+      "portrait": "Portrait",
+      "landscape": "Landscape"
+    },
+    "margins": {
+      "custom": "Custom margins",
+      "top": "Top",
+      "right": "Right",
+      "bottom": "Bottom",
+      "left": "Left"
+    },
+    "scale": {
+      "mode": "Scale mode",
+      "modes": {
+        "percent": "Percentage",
+        "fit_sheet": "One sheet",
+        "fit_grid": "Grid",
+        "fit_count": "Max. number of sheets",
+        "final_size": "Final size",
+        "drawing_scale": "Drawing scale"
+      },
+      "percent": "Scale",
+      "cols": "Columns",
+      "rows": "Rows",
+      "maxSheets": "At most this many sheets",
+      "finalDimension": "Fixed dimension",
+      "dimension": {
+        "width": "Width",
+        "height": "Height"
+      },
+      "finalSize": "Final size",
+      "drawingFrom": "Original scale",
+      "drawingTo": "Print scale",
+      "result": "Resulting scale: {{scale}}",
+      "resultRatio": "Resulting scale: {{scale}} ({{extra}})",
+      "detected": "Scale 1:{{n}} detected in the drawing."
+    },
+    "rotate": {
+      "label": "Rotation"
+    },
+    "box": {
+      "label": "Page box",
+      "crop": "Crop box",
+      "trim": "Trim box",
+      "bleed": "Bleed box",
+      "media": "Media box"
+    },
+    "pages": {
+      "label": "Pages",
+      "hint": "“all” or ranges like 1,3-5"
+    },
+    "tiling": {
+      "join": "Join method",
+      "joins": {
+        "overlap": "Overlap",
+        "butt": "Butt joint"
+      },
+      "overlap": "Overlap",
+      "alignX": "Horizontal alignment",
+      "alignY": "Vertical alignment",
+      "align": {
+        "start": "Start",
+        "center": "Center",
+        "end": "End"
+      },
+      "skipBlank": "Skip blank sheets",
+      "sensitivity": "Sensitivity",
+      "sensitivities": {
+        "strict": "Strict",
+        "normal": "Normal",
+        "tolerant": "Tolerant"
+      },
+      "order": "Order",
+      "orders": {
+        "rows": "By rows",
+        "columns": "By columns"
+      },
+      "naming": "Naming",
+      "namings": {
+        "letter_number": "Letter + number (B3)",
+        "number_number": "Number-number (2-3)",
+        "sequential": "Sequential (7)"
+      }
+    },
+    "marks": {
+      "cutLines": "Cut lines",
+      "outerCutLines": "Outer cut lines",
+      "alignmentMarks": "Alignment marks",
+      "joinDiamonds": "Join diamonds (butt joint)",
+      "labels": "Sheet labels",
+      "neighborHints": "Neighbouring sheets",
+      "ruler": "50 mm ruler",
+      "glueShading": "Glue shading",
+      "testSquare": "Test square",
+      "testSquares": {
+        "none": "None",
+        "assembly_page": "On the assembly page",
+        "first_sheet": "On the first sheet"
+      },
+      "assemblyPage": "Assembly page",
+      "assemblyPages": {
+        "none": "None",
+        "first": "At the start",
+        "last": "At the end"
+      },
+      "marksLayer": "Marks in a hideable PDF layer"
+    },
+    "output": {
+      "filename": "File name",
+      "filenameHint": "Template with {name}, {paper}, {orientation}, {cols}, {rows} and {scale}",
+      "minLineWidth": "Minimum line width (mm)",
+      "minLineWidthHint": "Only for rasterized output; empty = off.",
+      "minLineWidthDisabled": "Only applies to rasterized output; turn on \"Rasterize output\" first.",
+      "rasterize": "Rasterize output",
+      "rasterizeHint": "Renders the pages as images at the chosen resolution (useful for printers that struggle with vector files).",
+      "dpi": "Resolution"
+    },
+    "mirror": "Mirror horizontally (transfers, screen printing)",
+    "layers": {
+      "title": "Layers",
+      "unnamed": "Layer {{n}}"
+    }
+  },
+  "cad": {
+    "open": "CAD options…",
+    "title": "CAD drawing options",
+    "message": "Choose what to print from the drawing. Exporting to PDF from your CAD program is still the most faithful option.",
+    "layout": "Layout",
+    "modelSpace": "model space",
+    "units": "Drawing units (model space)",
+    "unitsAuto": "As stored in the file",
+    "detected": {
+      "insunits": "The file says: {{units}}.",
+      "assumed": "The file does not say; {{units}} is assumed.",
+      "user": "Chosen by you: {{units}}."
+    },
+    "scale": "Scale",
+    "scaleHint": "Leave empty to pick a standard scale that fits an A0 sheet.",
+    "scaleAuto": "Automatic: 1:{{scale}}. Type a number to choose another one.",
+    "scaleAutoPlaceholder": "Automatic",
+    "paperSpaceNote": "A paper space layout keeps the page size and scale defined in the drawing.",
+    "color": "Colour",
+    "colors": {
+      "color": "Colour",
+      "black": "Black",
+      "gray": "Grey"
+    },
+    "apply": "Apply"
+  },
+  "physicalSize": {
+    "title": "What size does this image represent?",
+    "message": "The image does not state its real size. Choose how to set it to print it to scale.",
+    "mode": "How to set the size",
+    "modes": {
+      "paper": "Paper",
+      "width": "Width",
+      "height": "Height",
+      "dpi": "DPI"
+    },
+    "paper": "The image covers a paper of",
+    "width": "Image width",
+    "height": "Image height",
+    "dpi": "Pixels per inch (DPI)",
+    "apply": "Apply"
+  },
+  "password": {
+    "title": "Protected document",
+    "message": "This document is password protected. Enter the password to open it.",
+    "label": "Password",
+    "submit": "Open"
+  },
+  "sheetPreview": {
+    "title": "Sheet {{id}}",
+    "alt": "Exact preview of sheet {{id}} with its marks"
+  },
+  "progress": {
+    "waiting": "Waiting…",
+    "generic": "Processing…",
+    "ingest": {
+      "detect": "Detecting the file type…",
+      "analyze": "Analysing the document…",
+      "page": "Building the preview of page {{k}} of {{n}}…",
+      "done": "Done"
+    },
+    "render": {
+      "start": "Preparing {{pages}} page(s)…",
+      "sheet": "Drawing sheet {{sheet}} ({{k}} of {{n}})…",
+      "assembly": "Drawing the assembly page…",
+      "save": "Saving the PDF…",
+      "done": "Done"
+    },
+    "print": {
+      "connect": "Contacting the printer…",
+      "convert": "Converting to a format the printer accepts…",
+      "send": "Sending the document…",
+      "printing": "The printer is working…"
+    }
+  },
+  "result": {
+    "title": "Result",
+    "testTitle": "Test sheet",
+    "progress": "Job progress",
+    "cancel": "Cancel",
+    "failed": "The result could not be generated",
+    "cancelled": "The job was cancelled.",
+    "backToEditor": "Back to the editor",
+    "testHint": {
+      "title": "Print this sheet first",
+      "text": "Measure the test square: it must measure 50 mm (or 2 in). If it is right, generate the full document."
+    },
+    "generateFull": "Generate the full document",
+    "printTestFirst": "Print the test sheet first",
+    "download": "Download",
+    "print": "Print",
+    "pages_one": "{{count}} page",
+    "pages_other": "{{count}} pages",
+    "pageThumb": "Thumbnail of page {{n}}",
+    "morePages_one": "and {{count}} more page",
+    "morePages_other": "and {{count}} more pages",
+    "ipp": {
+      "title": "Send to a printer",
+      "hint": "Prints directly over IPP at 100 % (no scaling, one-sided).",
+      "printer": "Printer",
+      "copies": "Copies",
+      "sheets": "Sheets",
+      "sheetsHint": "All pages, or sheets such as A1, B3-B5",
+      "invalidSheets": "Unknown sheets: {{sheets}}",
+      "send": "Send to printer",
+      "sending": "Sending…",
+      "sent": "The printer accepted the job (#{{id}}).",
+      "completed": "The printer finished the job (#{{id}}).",
+      "unknown": "The printer accepted the job (#{{id}}) but did not report its progress.",
+      "failed": "The job could not be printed"
+    },
+    "ink": {
+      "title": "Estimated ink",
+      "total": "About {{pct}} % coverage ({{area}} cm² of solid ink) over all sheets.",
+      "note": "Estimate from low-resolution renders; real consumption depends on the printer."
+    }
+  },
+  "instructions": {
+    "title": "How to print and assemble",
+    "paperFallback": "the chosen one",
+    "print": {
+      "title": "Printing instructions",
+      "step1": "Print at actual size / 100 % scale. Turn off “Fit to page”, “Fit to printable area” or “Shrink oversized pages”. Do not use the viewer's “Poster” mode.",
+      "step2": "Choose {{paper}} paper and one-sided printing.",
+      "step3": "Print the assembly page first and measure the test square: it must measure 50 mm (or 2 in). If not, check step 1 or calibrate the printer."
+    },
+    "overlap": {
+      "title": "Assembly with overlap",
+      "step1": "Arrange the sheets following the assembly page (A1 at the top left).",
+      "step2": "On each sheet, trim the margin along the dashed line on the left and top edges (except in the first column and the first row).",
+      "step3": "Join each row from left to right: place each sheet over the right strip of the previous one, aligning its edge with the alignment line (▶), and glue.",
+      "step4": "Join the rows from top to bottom in the same way, over the bottom strip."
+    },
+    "butt": {
+      "title": "Butt-joint assembly",
+      "text": "Trim all interior edges along the dashed line and bring the sheets together so that the half diamonds match. Tape them from behind."
+    }
+  },
+  "help": {
+    "title": "Help",
+    "intro": "How to print at actual size, assemble the sheets and answers to common questions.",
+    "print100": {
+      "title": "Printing at 100 %",
+      "intro": "If the viewer shrinks the sheets to fit, the result will not line up. Always look for the actual-size option."
+    },
+    "viewers": {
+      "chrome": {
+        "name": "Google Chrome",
+        "text": "In the print dialog open “More settings” and under “Scale” choose “Default” (100 %). Do not tick “Fit to printable area”."
+      },
+      "edge": {
+        "name": "Microsoft Edge",
+        "text": "Under “More settings” set “Scale” to 100 % and turn off “Fit to page”."
+      },
+      "firefox": {
+        "name": "Firefox",
+        "text": "Under “Scale” choose “Custom” with 100 %, not “Shrink to fit”."
+      },
+      "acrobat": {
+        "name": "Adobe Acrobat Reader",
+        "text": "Under “Page Sizing & Handling” choose “Actual size”. Do not use “Fit” or “Shrink oversized pages”."
+      },
+      "preview": {
+        "name": "Preview (macOS)",
+        "text": "In the print dialog show the details and set “Scale” to 100 %; untick “Scale to fit”."
+      }
+    },
+    "assembly": {
+      "title": "Assembling the sheets"
+    },
+    "formats": {
+      "title": "Supported formats"
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "scale": {
+        "q": "The test square does not measure 50 mm",
+        "a": "It is almost always because the viewer fitted the page. Print again at actual size. If it persists, the printer has its own scale error."
+      },
+      "blank": {
+        "q": "Why are some sheets skipped?",
+        "a": "Sheets with no content are not printed to save paper. You can change the sensitivity or turn it off under “Tiling”."
+      },
+      "raster": {
+        "q": "My image comes out at a strange size",
+        "a": "Images without a reliable resolution get an assumed size. Tell us what size they represent from the warning in the editor."
+      }
+    }
+  },
+  "settingsPage": {
+    "title": "Settings",
+    "units": {
+      "title": "Units",
+      "mm": "Millimetres",
+      "cm": "Centimetres",
+      "in": "Inches",
+      "hint": "Everything is calculated internally in millimetres."
+    },
+    "language": {
+      "title": "Language"
+    },
+    "storage": {
+      "title": "Storage",
+      "text": "Documents and results are deleted automatically after {{hours}} h.",
+      "purgeExpired": "Delete expired",
+      "purgeAll": "Delete everything now",
+      "confirmTitle": "Delete all documents and results?",
+      "confirmText": "All documents and jobs will be removed, including those that have not expired. This cannot be undone.",
+      "done": "Deleted {{documents}} documents and {{jobs}} jobs.",
+      "retentionLabel": "Retention (hours)",
+      "saveRetention": "Save retention",
+      "retentionLocked": "The retention is fixed by the server configuration (A0TD_RETENTION_HOURS) and cannot be changed here."
+    },
+    "system": {
+      "title": "System",
+      "version": "Version",
+      "maxUpload": "Maximum upload size",
+      "maxSheets": "Maximum sheets per job",
+      "retention": "Retention"
+    },
+    "defaults": {
+      "title": "Defaults for new documents",
+      "paper": "Default paper",
+      "letter": "Letter",
+      "printer": "Default printer profile",
+      "noPrinter": "Generic"
+    }
+  },
+  "printers": {
+    "title": "Printers",
+    "intro": "Printer profiles define margins per paper, colour and calibration. Built-in profiles are read-only; duplicate one to adapt it.",
+    "new": "New profile",
+    "builtin": "Built-in",
+    "edit": "Edit",
+    "duplicate": "Duplicate",
+    "delete": "Delete",
+    "calibrate": "Calibrate",
+    "confirmDelete": "Delete the profile \"{{name}}\"?",
+    "copySuffix": "(copy)",
+    "loading": "Loading…",
+    "colName": "Name",
+    "colKind": "Type",
+    "colMargins": "Margins (mm)",
+    "colScale": "Correction",
+    "colActions": "Actions",
+    "uncalibrated": "not calibrated",
+    "calibrated": "calibrated",
+    "color": "Colour",
+    "mono": "Mono",
+    "borderless": "Borderless",
+    "kind": {
+      "generic": "Generic",
+      "inkjet": "Inkjet",
+      "laser": "Laser",
+      "borderless": "Borderless"
+    },
+    "defaults": {
+      "title": "Region defaults",
+      "paper": "Default paper",
+      "unit": "Units",
+      "hint": "Chosen from your browser region (Letter and in in US/CA, Letter and mm in Latin America, A4 and mm elsewhere). You can change them."
+    },
+    "form": {
+      "titleNew": "New printer profile",
+      "titleEdit": "Edit profile",
+      "name": "Name",
+      "kind": "Type",
+      "color": "Colour printer",
+      "borderless": "Borderless printing",
+      "papers": "Supported papers",
+      "defaultMargins": "Default margins (mm)",
+      "paperMargins": "Margins per paper (mm)",
+      "addPaper": "Add margins for a paper",
+      "removePaper": "Remove margins for {{paper}}",
+      "top": "Top",
+      "right": "Right",
+      "bottom": "Bottom",
+      "left": "Left",
+      "scale": "Calibration correction: {{kx}} × {{ky}}",
+      "save": "Save",
+      "cancel": "Cancel",
+      "readonly": "Built-in profiles cannot be edited: saving creates your own copy.",
+      "ippUri": "IPP address",
+      "ippUriHint": "For example ipp://192.168.1.20:631/ipp/print (needed for direct printing)",
+      "readCaps": "Read capabilities",
+      "capsRead": "Read {{count}} known paper size(s) from the printer. Accepts: {{pdf}}.",
+      "capsNoPdf": "PWG Raster only (it will be converted)"
+    },
+    "cal": {
+      "title": "Calibrate \"{{name}}\"",
+      "steps": {
+        "print": "Print",
+        "measure": "Measure",
+        "done": "Done"
+      },
+      "paper": "Paper for the test page",
+      "download": "Download calibration PDF",
+      "printHelp": "Print it at 100 % (actual size), with \"Fit to page\" turned off, on the selected paper. Then measure the rulers with an accurate ruler and read the margin frames.",
+      "next": "Next",
+      "back": "Back",
+      "nominalX": "Horizontal ruler: {{mm}} mm nominal",
+      "nominalY": "Vertical ruler: {{mm}} mm nominal",
+      "measuredX": "Measured horizontal length (mm)",
+      "measuredY": "Measured vertical length (mm)",
+      "marginsHelp": "For each side enter the margin of the first frame that appears complete (the frame labels give its distance in mm).",
+      "kResult": "Correction k = {{kx}} × {{ky}}",
+      "outOfRange": "The correction is outside {{min}}–{{max}}: you probably printed with \"Fit to page\". Print at 100 % and measure again. Nothing is saved.",
+      "save": "Save calibration",
+      "saved": "Calibration saved. Margins stored: {{top}} / {{right}} / {{bottom}} / {{left}} mm (measured + 0.5 mm). Correction {{kx}} × {{ky}}.",
+      "backToList": "Back to printers",
+      "builtinBlocked": "Built-in profiles cannot be calibrated. Duplicate it first.",
+      "notFound": "Profile not found."
+    }
+  },
+  "tokenMode": {
+    "title": "Browser access is disabled",
+    "body": "This server uses token authentication (A0TD_AUTH_MODE=token), which is meant for the API and the command line only. The web app cannot be used in this mode.",
+    "hint": "Use the REST API with an Authorization: Bearer header, or ask the administrator to enable password authentication for the web interface."
+  },
+  "login": {
+    "title": "Sign in",
+    "intro": "This server is protected. Enter the password to continue.",
+    "password": "Password",
+    "wrong": "Wrong password.",
+    "rateLimited": "Too many attempts. Wait a minute and try again.",
+    "submit": "Sign in"
+  },
+  "presetsPage": {
+    "title": "Presets",
+    "intro": "Built-in presets are read-only. Create your own from the settings of the document you were last editing, then rename, export or share them as JSON files.",
+    "createTitle": "New preset from current settings",
+    "nameLabel": "Name",
+    "createFromCurrent": "Create from current settings",
+    "noDocument": "Open a document in the editor first: its settings are what gets saved.",
+    "import": "Import JSON",
+    "importInvalid": "That file is not valid JSON.",
+    "colName": "Name",
+    "colType": "Type",
+    "colActions": "Actions",
+    "builtin": "Built-in",
+    "user": "Yours",
+    "export": "Export",
+    "rename": "Rename",
+    "delete": "Delete",
+    "confirmDelete": "Confirm delete",
+    "save": "Save",
+    "saveAs": "Save as preset",
+    "saved": "Preset saved.",
+    "goToPresets": "View presets"
+  },
+  "history": {
+    "title": "History",
+    "search": "Search by document name",
+    "documents": "Documents",
+    "jobs": "Jobs",
+    "empty": "Nothing here yet.",
+    "colName": "Document",
+    "colStatus": "Status",
+    "colCreated": "Created",
+    "colExpires": "Expires",
+    "colOutputs": "Downloads",
+    "colActions": "Actions",
+    "reopen": "Reopen in editor",
+    "regenerate": "Regenerate",
+    "delete": "Delete",
+    "confirmDelete": "Confirm delete",
+    "testSheet": "Test sheet",
+    "download": "Download {{name}}",
+    "jobStatus": {
+      "queued": "Queued",
+      "running": "Running",
+      "succeeded": "Done",
+      "failed": "Failed",
+      "cancelled": "Cancelled"
+    }
+  }
+}

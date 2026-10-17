@@ -1,0 +1,17 @@
+**/.git
+**/node_modules
+**/dist
+**/__pycache__
+**/*.pyc
+**/.venv
+**/.mypy_cache
+**/.ruff_cache
+**/.pytest_cache
+**/.coverage
+.claude
+.recall
+.devcontainer
+SPEC.md
+*.md
+compose*.yml
+data

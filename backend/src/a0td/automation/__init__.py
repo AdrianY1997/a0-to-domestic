@@ -1,0 +1,1 @@
+"""Background automation (watched folder)."""

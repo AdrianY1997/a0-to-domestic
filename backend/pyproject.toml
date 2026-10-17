@@ -1,0 +1,82 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "a0td"
+version = "0.1.0"
+description = "a0-to-domestic: tile large-format documents onto domestic printer paper"
+license = "AGPL-3.0-or-later"
+requires-python = ">=3.13"
+dependencies = [
+  "fastapi",
+  "uvicorn[standard]",
+  "pydantic>=2",
+  "pydantic-settings",
+  "sqlalchemy>=2",
+  "alembic",
+  "python-multipart",
+  "pymupdf",
+  "pyvips",
+  "pillow",
+  "pillow-heif",
+  "numpy",
+  "typer",
+  "defusedxml",
+  "argon2-cffi",
+  "ezdxf",
+  "prometheus-client",  # /metrics (ADM-04)
+  "zeroconf",  # mDNS printer discovery (IMP-04)
+]
+
+[project.scripts]
+a0td = "a0td.cli.main:app"
+
+[dependency-groups]
+dev = [
+  "pytest",
+  "pytest-cov",
+  "hypothesis",
+  "httpx",
+  "ruff",
+  "mypy",
+  "python-pptx",
+  "python-docx",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/a0td"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-ra"
+
+[tool.coverage.run]
+source = ["a0td"]
+branch = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "C4", "PT"]
+
+[tool.mypy]
+python_version = "3.13"
+plugins = ["pydantic.mypy"]
+mypy_path = "src"
+
+[[tool.mypy.overrides]]
+module = ["a0td.domain.*", "a0td.render.*"]
+strict = true
+
+[[tool.mypy.overrides]]
+module = "a0td.render.*"
+disallow_untyped_calls = false  # PyMuPDF / pyvips are (partly) untyped
+
+[[tool.mypy.overrides]]
+module = ["pyvips", "pyvips.*", "pymupdf", "pymupdf.*"]
+ignore_missing_imports = true

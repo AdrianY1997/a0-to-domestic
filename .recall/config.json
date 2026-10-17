@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "caps": {
+    "maxLiveNodes": 1000,
+    "maxNodeTokens": 1200,
+    "warnNodeTokens": 800,
+    "maxJournalBytes": 5242880,
+    "sessionFileTtlDays": 7
+  },
+  "recall": {
+    "topK": 3,
+    "maxK": 5,
+    "scoreFloor": 1.5
+  },
+  "state": {
+    "ttlDays": 7,
+    "maxLive": 1
+  },
+  "autopilot": {
+    "enabled": true
+  }
+}

@@ -1,0 +1,871 @@
+{
+  "app": {
+    "name": "a0-to-domestic"
+  },
+  "nav": {
+    "home": "Inicio",
+    "printers": "Impresoras",
+    "presets": "Presets",
+    "history": "Historial",
+    "help": "Ayuda",
+    "settings": "Ajustes",
+    "main": "Navegación principal"
+  },
+  "header": {
+    "language": "Idioma",
+    "toggleTheme": "Cambiar tema claro/oscuro",
+    "logout": "Cerrar sesión"
+  },
+  "lang": {
+    "es": "Español",
+    "en": "English"
+  },
+  "pages": {
+    "home": {
+      "title": "Inicio",
+      "description": "Sube un documento para empezar."
+    },
+    "editor": {
+      "title": "Editor",
+      "description": "Documento {{id}}"
+    },
+    "result": {
+      "title": "Resultado",
+      "description": "Trabajo {{id}}"
+    },
+    "printers": {
+      "title": "Impresoras",
+      "description": "Perfiles de impresora."
+    },
+    "calibrate": {
+      "title": "Calibración",
+      "description": "Impresora {{id}}"
+    },
+    "presets": {
+      "title": "Presets",
+      "description": "Presets integrados y de usuario."
+    },
+    "history": {
+      "title": "Historial",
+      "description": "Documentos y trabajos."
+    },
+    "settings": {
+      "title": "Ajustes",
+      "description": "Idioma, unidades y valores por defecto."
+    },
+    "help": {
+      "title": "Ayuda",
+      "description": "Cómo imprimir al 100 % y montar las hojas."
+    },
+    "login": {
+      "title": "Acceso",
+      "description": "Identifícate para continuar."
+    },
+    "notFound": {
+      "title": "Página no encontrada",
+      "description": "La ruta no existe."
+    }
+  },
+  "common": {
+    "placeholder": "Próximamente.",
+    "error": "Error",
+    "close": "Cerrar",
+    "cancel": "Cancelar",
+    "backHome": "Volver al inicio"
+  },
+  "orientation": {
+    "auto": "automática",
+    "portrait": "vertical",
+    "landscape": "horizontal"
+  },
+  "errors": {
+    "INTERNAL_ERROR": "Error interno del servidor. Reintenta; si persiste, revisa los registros del servidor.",
+    "UNKNOWN": "Ha ocurrido un error inesperado. Inténtalo de nuevo.",
+    "NETWORK_ERROR": "No se pudo conectar con el servidor. Comprueba la conexión e inténtalo de nuevo.",
+    "UNSUPPORTED_FORMAT": "Formato no soportado. Prueba con uno de los formatos de la lista.",
+    "FORMAT_NOT_AVAILABLE_IN_IMAGE": "Este formato no está disponible en esta imagen de la aplicación. Convierte el archivo a PDF o usa la imagen completa.",
+    "FILE_TOO_LARGE": "El archivo supera el límite de {{max_mb}} MB. Reduce su tamaño o divídelo.",
+    "TOO_MANY_PAGES": "El documento tiene demasiadas páginas. Sube solo las que necesites.",
+    "PIXEL_LIMIT_EXCEEDED": "La imagen tiene demasiados píxeles. Reduce su resolución y vuelve a subirla.",
+    "PAGE_TOO_LARGE": "La página es demasiado grande. Reduce su tamaño y vuelve a subirla.",
+    "PASSWORD_REQUIRED": "El documento está protegido con contraseña. Introdúcela para continuar.",
+    "PASSWORD_INVALID": "La contraseña no es correcta. Inténtalo de nuevo.",
+    "PRINT_NOT_ALLOWED": "El documento prohíbe la impresión y no se puede procesar.",
+    "CORRUPT_FILE": "El archivo está dañado y no se pudo abrir. Prueba a exportarlo de nuevo desde su programa.",
+    "CONVERSION_FAILED": "No se pudo convertir el archivo. Prueba a guardarlo como PDF y súbelo de nuevo.",
+    "CONVERSION_TIMEOUT": "La conversión tardó demasiado. Prueba con un archivo más sencillo.",
+    "INVALID_SETTINGS": "Algún ajuste no es válido. Revisa los valores marcados.",
+    "OVERLAP_TOO_LARGE": "El solape es demasiado grande para este papel. Redúcelo o usa un papel mayor.",
+    "CONTENT_AREA_TOO_SMALL": "El área útil de la hoja es demasiado pequeña. Reduce los márgenes o elige otro papel.",
+    "SCALE_OUT_OF_RANGE": "La escala resultante queda fuera del rango permitido (1 % a 1000 %).",
+    "TOO_MANY_SHEETS": "El resultado necesitaría demasiadas hojas. Reduce la escala o usa un papel mayor.",
+    "DOCUMENT_NOT_READY": "El documento todavía no está listo. Espera a que termine el procesamiento.",
+    "NOT_FOUND": "No se encontró el recurso. Puede que haya caducado; vuelve al inicio y súbelo de nuevo.",
+    "JOB_CANCELLED": "El trabajo se canceló.",
+    "INTERRUPTED": "El trabajo se interrumpió. Vuelve a generarlo.",
+    "PRINTER_UNREACHABLE": "No se pudo contactar con la impresora.",
+    "AUTH_REQUIRED": "Debes identificarte para continuar.",
+    "RENDER_UNAVAILABLE": "La vista previa exacta de la hoja no está disponible en este servidor.",
+    "CALIBRATION_OUT_OF_RANGE": "El factor de escala ({{kx}} × {{ky}}) queda fuera de {{min}}–{{max}}. Probablemente se imprimió con «Ajustar a página»; imprime al 100 % y vuelve a medir.",
+    "PRINTER_READONLY": "Los perfiles integrados no se pueden modificar. Duplícalo para tener tu propio perfil.",
+    "PRESET_READONLY": "Los presets integrados no se pueden modificar. Guarda una copia como preset propio.",
+    "INVALID_CREDENTIALS": "Contraseña incorrecta.",
+    "RATE_LIMITED": "Demasiados intentos. Espera un minuto e inténtalo de nuevo.",
+    "CSRF_INVALID": "El token de seguridad de la sesión no es válido. Recarga la página e inténtalo de nuevo.",
+    "PRINT_REJECTED": "La impresora rechazó o abortó el trabajo. Revisa su estado (papel, tinta, formatos admitidos).",
+    "IPP_DISABLED": "La impresión directa está desactivada en este servidor (A0TD_ENABLE_IPP).",
+    "DISCOVERY_UNAVAILABLE": "La detección de impresoras no está disponible aquí. Escribe la dirección de la impresora a mano."
+  },
+  "document": {
+    "status": {
+      "processing": "Procesando…",
+      "password_required": "Requiere contraseña",
+      "ready": "Listo",
+      "failed": "Error"
+    },
+    "kind": {
+      "vector": "Vectorial",
+      "raster": "Imagen",
+      "mixed": "Mixto"
+    },
+    "failed": "No se pudo procesar el documento",
+    "supportedFormats": "Formatos admitidos: {{formats}}."
+  },
+  "home": {
+    "title": "Imprime planos grandes en hojas pequeñas",
+    "subtitle": "Sube un plano, un patrón o una imagen y obtén un PDF de hojas con marcas para montarlo.",
+    "dropzone": {
+      "label": "Zona para soltar archivos",
+      "title": "Arrastra tus archivos aquí o pulsa para elegirlos",
+      "hint": "Puedes subir varios a la vez; cada uno es un documento.",
+      "limit": "Máximo {{mb}} MB por archivo.",
+      "keyboard": "Con el teclado: enfoca esta zona y pulsa Intro."
+    },
+    "uploads": {
+      "title": "Subidas",
+      "clear": "Limpiar lista",
+      "progress": "Progreso de la subida de {{name}}",
+      "done": "Subido ({{size}} MB)",
+      "open": "Abrir"
+    },
+    "presets": {
+      "title": "Inicio rápido con un preset",
+      "hint": "Elige un preset y después sube el archivo: se aplicará automáticamente.",
+      "none": "Sin preset"
+    },
+    "formats": {
+      "title": "Formatos admitidos",
+      "more": "El tipo se detecta por el contenido del archivo, no por su extensión."
+    },
+    "recent": {
+      "title": "Documentos recientes",
+      "empty": "Todavía no hay documentos.",
+      "delete": "Eliminar {{name}}"
+    }
+  },
+  "editor": {
+    "preview": "Vista previa",
+    "document": {
+      "title": "Documento",
+      "nonStandard": "Tamaño no estándar",
+      "dpi": "{{dpi}} PPP",
+      "page": "Página",
+      "pageOf": "{{n}}/{{total}} · {{size}}",
+      "setSize": "Indicar el tamaño real…"
+    },
+    "warnings": {
+      "none": "Sin avisos.",
+      "title": "Avisos ({{count}})"
+    },
+    "sheetList": {
+      "title": "Lista de hojas ({{count}})",
+      "open": "Vista previa exacta de la hoja {{id}}",
+      "printIndex": "hoja {{k}}"
+    },
+    "sheetState": {
+      "printed": "se imprime",
+      "blank": "vacía, omitida",
+      "deselected": "excluida"
+    },
+    "sheetAria": "Hoja {{id}}, {{state}}. Intro para ver la vista previa exacta.",
+    "sheetTitle": "Hoja {{id}} (doble clic: vista previa exacta)",
+    "tool": {
+      "label": "Herramienta",
+      "pan": "Mover",
+      "grid": "Rejilla",
+      "region": "Región",
+      "hint": {
+        "pan": "Arrastra para desplazar. Clic en una hoja para incluirla o excluirla.",
+        "grid": "Arrastra para desplazar la rejilla dentro del margen disponible.",
+        "region": "Arrastra para dibujar la región del documento que quieres imprimir."
+      }
+    },
+    "tools": {
+      "title": "Mosaico",
+      "sheets": {
+        "label": "Reimprimir hojas",
+        "hint": "Ejemplo: A1, B3-B5. Vacío = todas. También puedes hacer clic en las hojas.",
+        "placeholder": "Todas las hojas",
+        "invalid": "Hojas desconocidas: {{ids}}",
+        "count": "{{chosen}} de {{total}} hojas incluidas",
+        "all": "Todas",
+        "none": "Ninguna"
+      },
+      "offset": {
+        "label": "Desplazamiento de la rejilla",
+        "x": "Horizontal",
+        "y": "Vertical",
+        "hint": "Usa la herramienta Rejilla para arrastrar.",
+        "reset": "Centrar"
+      },
+      "region": {
+        "label": "Región",
+        "none": "Se imprime toda la página.",
+        "x": "X",
+        "y": "Y",
+        "width": "Ancho",
+        "height": "Alto",
+        "draw": "Dibujar región",
+        "clear": "Quitar región"
+      },
+      "autoTrim": {
+        "label": "Recorte automático",
+        "hint": "Ajusta el área al contenido y quita los bordes vacíos."
+      }
+    },
+    "alternatives": {
+      "title": "Alternativas",
+      "show": "Mostrar",
+      "hide": "Ocultar",
+      "loading": "Calculando alternativas…",
+      "empty": "No hay alternativas para este documento.",
+      "scale": "Hojas necesarias a la misma escala ({{scale}})",
+      "paper": "Papel",
+      "cell": "{{sheets}} ({{cols}}×{{rows}})",
+      "apply": "Usar {{paper}} {{orientation}}: {{sheets}} hojas",
+      "savings": "Ahorra hojas reduciendo un poco la escala",
+      "saving": "{{scale}}: {{sheets}} hojas (ahorras {{saved}})"
+    },
+    "overlay": {
+      "label": "Rejilla de {{cols}} × {{rows}} hojas, {{sheets}} a imprimir",
+      "toggles": "Capas de la vista previa",
+      "margins": "Márgenes",
+      "overlaps": "Solapes",
+      "ids": "IDs",
+      "hint": "Doble clic en una hoja para ver su vista previa exacta."
+    },
+    "zoom": {
+      "label": "Zoom de la vista previa",
+      "out": "Alejar",
+      "in": "Acercar",
+      "fit": "Encajar"
+    },
+    "settings": {
+      "title": "Ajustes",
+      "preset": "Preset",
+      "presetPlaceholder": "Ajustes personalizados"
+    },
+    "summary": {
+      "planError": "No se pudo calcular el mosaico",
+      "noSheets": "Con estos ajustes no hay ninguna hoja que imprimir.",
+      "sheets_one": "{{count}} hoja {{paper}} {{orientation}}",
+      "sheets_other": "{{count}} hojas {{paper}} {{orientation}}",
+      "blank_one": "{{count}} vacía omitida",
+      "blank_other": "{{count}} vacías omitidas",
+      "calculating": "Calculando…",
+      "testSheet": "Hoja de prueba",
+      "generate": "Generar"
+    }
+  },
+  "warnings": {
+    "ignore": "Ignorar",
+    "action": {
+      "reduceScale": "Reducir escala",
+      "fitSheet": "Reducir a una hoja",
+      "setPhysicalSize": "Indicar tamaño",
+      "useCropBox": "Usar el recorte"
+    },
+    "LOW_DPI": {
+      "title": "Resolución baja",
+      "message": "A esta escala la resolución efectiva es de {{dpi}} PPP; la impresión puede verse pixelada."
+    },
+    "VERY_LOW_DPI": {
+      "title": "Resolución muy baja",
+      "message": "La resolución efectiva es de solo {{dpi}} PPP; la impresión se verá muy pixelada."
+    },
+    "PHYSICAL_SIZE_ASSUMED": {
+      "title": "Tamaño físico supuesto",
+      "message": "La imagen no indica su tamaño real, así que se ha supuesto uno. Indica qué tamaño representa para imprimirla a escala."
+    },
+    "NONSTANDARD_SIZE": {
+      "title": "Tamaño no estándar",
+      "message": "El tamaño de la página no coincide con ningún formato normalizado."
+    },
+    "SMALL_TEXT": {
+      "title": "Texto pequeño",
+      "message": "Con esta escala el texto puede quedar demasiado pequeño para leerse."
+    },
+    "THIN_LINES": {
+      "title": "Líneas muy finas",
+      "message": "Con esta escala algunas líneas quedarán más finas que 0,1 mm y pueden no imprimirse."
+    },
+    "MANY_SHEETS": {
+      "title": "Muchas hojas",
+      "message": "Se necesitan más de 50 hojas. Comprueba la escala y el papel."
+    },
+    "FONTS_SUBSTITUTED": {
+      "title": "Fuentes sustituidas",
+      "message": "Algunas fuentes no estaban disponibles y se sustituyeron; el aspecto puede variar."
+    },
+    "ANNOTATIONS_FLATTENED": {
+      "title": "Anotaciones aplanadas",
+      "message": "Las anotaciones y los campos de formulario se han incorporado al dibujo."
+    },
+    "LAYERS_PRESENT": {
+      "title": "Hay capas",
+      "message": "El documento tiene capas; se imprimen tal como están visibles."
+    },
+    "LAYERS_RASTERIZED": {
+      "title": "Capas rasterizadas",
+      "message": "Cambiaste el estado de capas, así que la salida se generó como imágenes para asegurar que el contenido oculto no se imprime."
+    },
+    "DARK_BACKGROUND": {
+      "title": "Fondo oscuro",
+      "message": "El documento tiene un fondo oscuro y gastará mucha tinta."
+    },
+    "PDF_REPAIRED": {
+      "title": "PDF reparado",
+      "message": "El PDF estaba dañado y se ha reparado automáticamente. Revisa el resultado."
+    },
+    "LOW_FIDELITY_FORMAT": {
+      "title": "Conversión aproximada",
+      "message": "Este formato se convierte con pérdida de fidelidad. Compara la vista previa con el original."
+    },
+    "BOX_FALLBACK": {
+      "title": "Caja no disponible",
+      "message": "La caja de página elegida no existe en este documento; se usa el recorte."
+    }
+  },
+  "settings": {
+    "sections": {
+      "paper": "Papel",
+      "scale": "Escala",
+      "tiling": "Mosaico",
+      "marks": "Marcas",
+      "output": "Salida"
+    },
+    "printer": {
+      "label": "Impresora"
+    },
+    "paper": {
+      "label": "Papel",
+      "custom": "Personalizado",
+      "width": "Ancho",
+      "height": "Alto",
+      "banner": "Rollo / banner",
+      "rollWidth": "Ancho del rollo",
+      "rollMaxLength": "Largo máximo",
+      "rollHint": "Una columna de hojas por ancho de rollo; cada hoja se corta al largo que necesita (nunca más que el máximo)."
+    },
+    "orientation": {
+      "label": "Orientación",
+      "auto": "Auto",
+      "portrait": "Vertical",
+      "landscape": "Horizontal"
+    },
+    "margins": {
+      "custom": "Márgenes personalizados",
+      "top": "Superior",
+      "right": "Derecho",
+      "bottom": "Inferior",
+      "left": "Izquierdo"
+    },
+    "scale": {
+      "mode": "Modo de escala",
+      "modes": {
+        "percent": "Porcentaje",
+        "fit_sheet": "Una hoja",
+        "fit_grid": "Rejilla",
+        "fit_count": "Nº máximo de hojas",
+        "final_size": "Tamaño final",
+        "drawing_scale": "Escala del dibujo"
+      },
+      "percent": "Escala",
+      "cols": "Columnas",
+      "rows": "Filas",
+      "maxSheets": "Hojas como máximo",
+      "finalDimension": "Medida fija",
+      "dimension": {
+        "width": "Ancho",
+        "height": "Alto"
+      },
+      "finalSize": "Tamaño final",
+      "drawingFrom": "Escala del original",
+      "drawingTo": "Escala de impresión",
+      "result": "Escala resultante: {{scale}}",
+      "resultRatio": "Escala resultante: {{scale}} ({{extra}})",
+      "detected": "Escala 1:{{n}} detectada en el dibujo."
+    },
+    "rotate": {
+      "label": "Rotación"
+    },
+    "box": {
+      "label": "Caja de página",
+      "crop": "Recorte (crop)",
+      "trim": "Corte final (trim)",
+      "bleed": "Sangrado (bleed)",
+      "media": "Medios (media)"
+    },
+    "pages": {
+      "label": "Páginas",
+      "hint": "«all» o rangos como 1,3-5"
+    },
+    "tiling": {
+      "join": "Método de unión",
+      "joins": {
+        "overlap": "Superposición",
+        "butt": "A tope"
+      },
+      "overlap": "Solape",
+      "alignX": "Alineación horizontal",
+      "alignY": "Alineación vertical",
+      "align": {
+        "start": "Inicio",
+        "center": "Centro",
+        "end": "Final"
+      },
+      "skipBlank": "Omitir hojas vacías",
+      "sensitivity": "Sensibilidad",
+      "sensitivities": {
+        "strict": "Estricta",
+        "normal": "Normal",
+        "tolerant": "Tolerante"
+      },
+      "order": "Orden",
+      "orders": {
+        "rows": "Por filas",
+        "columns": "Por columnas"
+      },
+      "naming": "Nomenclatura",
+      "namings": {
+        "letter_number": "Letra + número (B3)",
+        "number_number": "Número-número (2-3)",
+        "sequential": "Secuencial (7)"
+      }
+    },
+    "marks": {
+      "cutLines": "Líneas de corte",
+      "outerCutLines": "Líneas de corte exteriores",
+      "alignmentMarks": "Marcas de alineación",
+      "joinDiamonds": "Rombos de unión (a tope)",
+      "labels": "Etiquetas de hoja",
+      "neighborHints": "Hojas vecinas",
+      "ruler": "Regla de 50 mm",
+      "glueShading": "Sombreado de pegado",
+      "testSquare": "Cuadro de prueba",
+      "testSquares": {
+        "none": "Ninguno",
+        "assembly_page": "En el plano de montaje",
+        "first_sheet": "En la primera hoja"
+      },
+      "assemblyPage": "Plano de montaje",
+      "assemblyPages": {
+        "none": "Ninguno",
+        "first": "Al principio",
+        "last": "Al final"
+      },
+      "marksLayer": "Marcas en una capa PDF ocultable"
+    },
+    "output": {
+      "filename": "Nombre del archivo",
+      "filenameHint": "Plantilla con {name}, {paper}, {orientation}, {cols}, {rows} y {scale}",
+      "minLineWidth": "Grosor mínimo de línea (mm)",
+      "minLineWidthHint": "Solo en salida rasterizada; vacío = desactivado.",
+      "minLineWidthDisabled": "Solo para salida rasterizada; activa antes \"Rasterizar salida\".",
+      "rasterize": "Rasterizar salida",
+      "rasterizeHint": "Convierte las páginas en imágenes a la resolución elegida (útil si la impresora tiene problemas con vectores).",
+      "dpi": "Resolución"
+    },
+    "mirror": "Espejo horizontal (transferencias, serigrafía)",
+    "layers": {
+      "title": "Capas",
+      "unnamed": "Capa {{n}}"
+    }
+  },
+  "cad": {
+    "open": "Opciones CAD…",
+    "title": "Opciones del dibujo CAD",
+    "message": "Elige qué imprimir del dibujo. Exportar a PDF desde tu programa de CAD sigue siendo lo más fiel.",
+    "layout": "Presentación",
+    "modelSpace": "espacio modelo",
+    "units": "Unidades del dibujo (espacio modelo)",
+    "unitsAuto": "Las del archivo",
+    "detected": {
+      "insunits": "El archivo indica: {{units}}.",
+      "assumed": "El archivo no lo indica; se supone {{units}}.",
+      "user": "Elegidas por ti: {{units}}."
+    },
+    "scale": "Escala",
+    "scaleHint": "Déjalo vacío para usar una escala normalizada que quepa en un A0.",
+    "scaleAuto": "Automática: 1:{{scale}}. Escribe un número para elegir otra.",
+    "scaleAutoPlaceholder": "Automática",
+    "paperSpaceNote": "Una presentación del espacio papel conserva el tamaño de página y la escala del dibujo.",
+    "color": "Color",
+    "colors": {
+      "color": "Color",
+      "black": "Negro",
+      "gray": "Gris"
+    },
+    "apply": "Aplicar"
+  },
+  "physicalSize": {
+    "title": "¿Qué tamaño representa esta imagen?",
+    "message": "La imagen no indica su tamaño real. Elige cómo fijarlo para imprimirla a escala.",
+    "mode": "Cómo indicar el tamaño",
+    "modes": {
+      "paper": "Papel",
+      "width": "Ancho",
+      "height": "Alto",
+      "dpi": "PPP"
+    },
+    "paper": "La imagen ocupa un papel",
+    "width": "Ancho de la imagen",
+    "height": "Alto de la imagen",
+    "dpi": "Píxeles por pulgada (PPP)",
+    "apply": "Aplicar"
+  },
+  "password": {
+    "title": "Documento protegido",
+    "message": "Este documento está protegido con contraseña. Introdúcela para abrirlo.",
+    "label": "Contraseña",
+    "submit": "Abrir"
+  },
+  "sheetPreview": {
+    "title": "Hoja {{id}}",
+    "alt": "Vista previa exacta de la hoja {{id}} con sus marcas"
+  },
+  "progress": {
+    "waiting": "Esperando…",
+    "generic": "Procesando…",
+    "ingest": {
+      "detect": "Detectando el tipo de archivo…",
+      "analyze": "Analizando el documento…",
+      "page": "Generando la vista previa de la página {{k}} de {{n}}…",
+      "done": "Listo"
+    },
+    "render": {
+      "start": "Preparando {{pages}} página(s)…",
+      "sheet": "Dibujando la hoja {{sheet}} ({{k}} de {{n}})…",
+      "assembly": "Dibujando el plano de montaje…",
+      "save": "Guardando el PDF…",
+      "done": "Listo"
+    },
+    "print": {
+      "connect": "Contactando con la impresora…",
+      "convert": "Convirtiendo a un formato que la impresora acepte…",
+      "send": "Enviando el documento…",
+      "printing": "La impresora está trabajando…"
+    }
+  },
+  "result": {
+    "title": "Resultado",
+    "testTitle": "Hoja de prueba",
+    "progress": "Progreso del trabajo",
+    "cancel": "Cancelar",
+    "failed": "No se pudo generar el resultado",
+    "cancelled": "El trabajo se canceló.",
+    "backToEditor": "Volver al editor",
+    "testHint": {
+      "title": "Imprime esta hoja primero",
+      "text": "Mide el cuadro de prueba: debe medir 50 mm (o 2 in). Si es correcto, genera el documento completo."
+    },
+    "generateFull": "Generar el documento completo",
+    "printTestFirst": "Imprimir primero la hoja de prueba",
+    "download": "Descargar",
+    "print": "Imprimir",
+    "pages_one": "{{count}} página",
+    "pages_other": "{{count}} páginas",
+    "pageThumb": "Miniatura de la página {{n}}",
+    "morePages_one": "y {{count}} página más",
+    "morePages_other": "y {{count}} páginas más",
+    "ipp": {
+      "title": "Enviar a impresora",
+      "hint": "Imprime directamente por IPP al 100 % (sin escalado, a una cara).",
+      "printer": "Impresora",
+      "copies": "Copias",
+      "sheets": "Hojas",
+      "sheetsHint": "Todas las páginas, u hojas como A1, B3-B5",
+      "invalidSheets": "Hojas desconocidas: {{sheets}}",
+      "send": "Enviar a impresora",
+      "sending": "Enviando…",
+      "sent": "La impresora aceptó el trabajo (n.º {{id}}).",
+      "completed": "La impresora terminó el trabajo (n.º {{id}}).",
+      "unknown": "La impresora aceptó el trabajo (n.º {{id}}) pero no informó de su progreso.",
+      "failed": "No se pudo imprimir el trabajo"
+    },
+    "ink": {
+      "title": "Tinta estimada",
+      "total": "Cobertura media de {{pct}} % ({{area}} cm² de tinta sólida) en todas las hojas.",
+      "note": "Estimación a partir de vistas de baja resolución; el consumo real depende de la impresora."
+    }
+  },
+  "instructions": {
+    "title": "Cómo imprimir y montar",
+    "paperFallback": "el elegido",
+    "print": {
+      "title": "Instrucciones de impresión",
+      "step1": "Imprime a tamaño real / escala 100 %. Desactiva «Ajustar a página», «Ajustar al área imprimible» o «Reducir páginas grandes». No uses el modo «Póster» del visor.",
+      "step2": "Elige el papel {{paper}} e impresión a una cara.",
+      "step3": "Imprime primero el plano de montaje y mide el cuadro de prueba: debe medir 50 mm (o 2 in). Si no, revisa el punto 1 o calibra la impresora."
+    },
+    "overlap": {
+      "title": "Montaje con superposición",
+      "step1": "Ordena las hojas según el plano de montaje (A1 arriba a la izquierda).",
+      "step2": "En cada hoja, recorta el margen por la línea discontinua de los bordes izquierdo y superior (excepto en la primera columna y la primera fila).",
+      "step3": "Une cada fila de izquierda a derecha: coloca cada hoja sobre la franja derecha de la anterior, alineando su borde con la línea de alineación (▶), y pega.",
+      "step4": "Une las filas de arriba abajo de la misma forma, sobre la franja inferior."
+    },
+    "butt": {
+      "title": "Montaje a tope",
+      "text": "Recorta todos los bordes interiores por la línea discontinua y junta las hojas haciendo coincidir los medios rombos. Pega con cinta por detrás."
+    }
+  },
+  "help": {
+    "title": "Ayuda",
+    "intro": "Cómo imprimir a tamaño real, montar las hojas y resolver dudas frecuentes.",
+    "print100": {
+      "title": "Imprimir al 100 %",
+      "intro": "Si el visor reduce las hojas para ajustarlas, el resultado no encajará. Busca siempre la opción de tamaño real."
+    },
+    "viewers": {
+      "chrome": {
+        "name": "Google Chrome",
+        "text": "En el diálogo de impresión abre «Más ajustes» y en «Escala» elige «Predeterminado» (100 %). No marques «Ajustar al área de impresión»."
+      },
+      "edge": {
+        "name": "Microsoft Edge",
+        "text": "En «Más ajustes» pon «Escala» en 100 % y desactiva «Ajustar a la página»."
+      },
+      "firefox": {
+        "name": "Firefox",
+        "text": "En «Escala» elige «Personalizada» con 100 %, no «Ajustar»."
+      },
+      "acrobat": {
+        "name": "Adobe Acrobat Reader",
+        "text": "En «Tamaño y manejo de páginas» elige «Tamaño real». No uses «Ajustar» ni «Reducir al área imprimible»."
+      },
+      "preview": {
+        "name": "Vista Previa (macOS)",
+        "text": "En el diálogo de impresión muestra los detalles y pon «Escala» al 100 %; desmarca «Escalar para ajustar»."
+      }
+    },
+    "assembly": {
+      "title": "Montaje de las hojas"
+    },
+    "formats": {
+      "title": "Formatos admitidos"
+    },
+    "faq": {
+      "title": "Preguntas frecuentes",
+      "scale": {
+        "q": "El cuadro de prueba no mide 50 mm",
+        "a": "Casi siempre es porque el visor ajustó la página. Vuelve a imprimir a tamaño real. Si persiste, la impresora tiene un error de escala propio."
+      },
+      "blank": {
+        "q": "¿Por qué se omiten algunas hojas?",
+        "a": "Las hojas sin contenido no se imprimen para ahorrar papel. Puedes cambiar la sensibilidad o desactivarlo en «Mosaico»."
+      },
+      "raster": {
+        "q": "Mi imagen sale a un tamaño raro",
+        "a": "Las imágenes sin resolución fiable tienen un tamaño supuesto. Indica qué tamaño representan desde el aviso del editor."
+      }
+    }
+  },
+  "settingsPage": {
+    "title": "Ajustes",
+    "units": {
+      "title": "Unidades",
+      "mm": "Milímetros",
+      "cm": "Centímetros",
+      "in": "Pulgadas",
+      "hint": "Internamente todo se calcula en milímetros."
+    },
+    "language": {
+      "title": "Idioma"
+    },
+    "storage": {
+      "title": "Almacenamiento",
+      "text": "Los documentos y resultados se borran automáticamente a las {{hours}} h.",
+      "purgeExpired": "Borrar caducados",
+      "purgeAll": "Borrar todo ahora",
+      "confirmTitle": "¿Borrar todos los documentos y resultados?",
+      "confirmText": "Se eliminarán todos los documentos y trabajos, también los que no han caducado. No se puede deshacer.",
+      "done": "Se borraron {{documents}} documentos y {{jobs}} trabajos.",
+      "retentionLabel": "Retención (horas)",
+      "saveRetention": "Guardar retención",
+      "retentionLocked": "La retención la fija la configuración del servidor (A0TD_RETENTION_HOURS) y no se puede cambiar aquí."
+    },
+    "system": {
+      "title": "Sistema",
+      "version": "Versión",
+      "maxUpload": "Tamaño máximo de subida",
+      "maxSheets": "Máximo de hojas por trabajo",
+      "retention": "Retención"
+    },
+    "defaults": {
+      "title": "Valores por defecto para documentos nuevos",
+      "paper": "Papel por defecto",
+      "letter": "Carta",
+      "printer": "Perfil de impresora por defecto",
+      "noPrinter": "Genérica"
+    }
+  },
+  "printers": {
+    "title": "Impresoras",
+    "intro": "Los perfiles de impresora definen márgenes por papel, color y calibración. Los integrados son de solo lectura; duplica uno para adaptarlo.",
+    "new": "Nuevo perfil",
+    "builtin": "Integrado",
+    "edit": "Editar",
+    "duplicate": "Duplicar",
+    "delete": "Borrar",
+    "calibrate": "Calibrar",
+    "confirmDelete": "¿Borrar el perfil «{{name}}»?",
+    "copySuffix": "(copia)",
+    "loading": "Cargando…",
+    "colName": "Nombre",
+    "colKind": "Tipo",
+    "colMargins": "Márgenes (mm)",
+    "colScale": "Corrección",
+    "colActions": "Acciones",
+    "uncalibrated": "sin calibrar",
+    "calibrated": "calibrada",
+    "color": "Color",
+    "mono": "Mono",
+    "borderless": "Sin bordes",
+    "kind": {
+      "generic": "Genérica",
+      "inkjet": "Inyección",
+      "laser": "Láser",
+      "borderless": "Sin bordes"
+    },
+    "defaults": {
+      "title": "Valores por región",
+      "paper": "Papel por defecto",
+      "unit": "Unidades",
+      "hint": "Se eligen según la región del navegador (Carta e in en US/CA, Carta y mm en Latinoamérica, A4 y mm en el resto). Puedes cambiarlos."
+    },
+    "form": {
+      "titleNew": "Nuevo perfil de impresora",
+      "titleEdit": "Editar perfil",
+      "name": "Nombre",
+      "kind": "Tipo",
+      "color": "Impresora a color",
+      "borderless": "Impresión sin bordes",
+      "papers": "Papeles admitidos",
+      "defaultMargins": "Márgenes por defecto (mm)",
+      "paperMargins": "Márgenes por papel (mm)",
+      "addPaper": "Añadir márgenes para un papel",
+      "removePaper": "Quitar márgenes de {{paper}}",
+      "top": "Superior",
+      "right": "Derecho",
+      "bottom": "Inferior",
+      "left": "Izquierdo",
+      "scale": "Corrección de calibración: {{kx}} × {{ky}}",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "readonly": "Los perfiles integrados no se editan: al guardar se crea tu propia copia.",
+      "ippUri": "Dirección IPP",
+      "ippUriHint": "Por ejemplo ipp://192.168.1.20:631/ipp/print (necesaria para imprimir directamente)",
+      "readCaps": "Leer capacidades",
+      "capsRead": "Se leyeron {{count}} tamaño(s) de papel conocidos de la impresora. Acepta: {{pdf}}.",
+      "capsNoPdf": "solo PWG Raster (se convertirá)"
+    },
+    "cal": {
+      "title": "Calibrar «{{name}}»",
+      "steps": {
+        "print": "Imprimir",
+        "measure": "Medir",
+        "done": "Hecho"
+      },
+      "paper": "Papel de la página de prueba",
+      "download": "Descargar PDF de calibración",
+      "printHelp": "Imprímelo al 100 % (tamaño real), con «Ajustar a página» desactivado, en el papel elegido. Después mide las reglas con una regla precisa y lee los marcos de márgenes.",
+      "next": "Siguiente",
+      "back": "Atrás",
+      "nominalX": "Regla horizontal: {{mm}} mm nominales",
+      "nominalY": "Regla vertical: {{mm}} mm nominales",
+      "measuredX": "Longitud horizontal medida (mm)",
+      "measuredY": "Longitud vertical medida (mm)",
+      "marginsHelp": "En cada lado introduce el margen del primer marco que aparece completo (la etiqueta del marco indica su distancia en mm).",
+      "kResult": "Corrección k = {{kx}} × {{ky}}",
+      "outOfRange": "La corrección queda fuera de {{min}}–{{max}}: probablemente imprimiste con «Ajustar a página». Imprime al 100 % y vuelve a medir. No se guarda nada.",
+      "save": "Guardar calibración",
+      "saved": "Calibración guardada. Márgenes guardados: {{top}} / {{right}} / {{bottom}} / {{left}} mm (medido + 0,5 mm). Corrección {{kx}} × {{ky}}.",
+      "backToList": "Volver a impresoras",
+      "builtinBlocked": "Los perfiles integrados no se pueden calibrar. Duplícalo primero.",
+      "notFound": "Perfil no encontrado."
+    }
+  },
+  "tokenMode": {
+    "title": "El acceso desde el navegador está desactivado",
+    "body": "Este servidor usa autenticación por token (A0TD_AUTH_MODE=token), pensada solo para la API y la línea de comandos. La aplicación web no se puede usar en este modo.",
+    "hint": "Usa la API REST con la cabecera Authorization: Bearer, o pide al administrador que active la autenticación por contraseña para la interfaz web."
+  },
+  "login": {
+    "title": "Acceso",
+    "intro": "Este servidor está protegido. Introduce la contraseña para continuar.",
+    "password": "Contraseña",
+    "wrong": "Contraseña incorrecta.",
+    "rateLimited": "Demasiados intentos. Espera un minuto e inténtalo de nuevo.",
+    "submit": "Entrar"
+  },
+  "presetsPage": {
+    "title": "Presets",
+    "intro": "Los presets integrados son de solo lectura. Crea los tuyos desde los ajustes del último documento que editaste; luego puedes renombrarlos, exportarlos o compartirlos como archivos JSON.",
+    "createTitle": "Nuevo preset desde los ajustes actuales",
+    "nameLabel": "Nombre",
+    "createFromCurrent": "Crear desde los ajustes actuales",
+    "noDocument": "Abre antes un documento en el editor: se guardan sus ajustes.",
+    "import": "Importar JSON",
+    "importInvalid": "Ese archivo no es un JSON válido.",
+    "colName": "Nombre",
+    "colType": "Tipo",
+    "colActions": "Acciones",
+    "builtin": "Integrado",
+    "user": "Propio",
+    "export": "Exportar",
+    "rename": "Renombrar",
+    "delete": "Borrar",
+    "confirmDelete": "Confirmar borrado",
+    "save": "Guardar",
+    "saveAs": "Guardar como preset",
+    "saved": "Preset guardado.",
+    "goToPresets": "Ver presets"
+  },
+  "history": {
+    "title": "Historial",
+    "search": "Buscar por nombre de documento",
+    "documents": "Documentos",
+    "jobs": "Trabajos",
+    "empty": "Todavía no hay nada.",
+    "colName": "Documento",
+    "colStatus": "Estado",
+    "colCreated": "Creado",
+    "colExpires": "Caduca",
+    "colOutputs": "Descargas",
+    "colActions": "Acciones",
+    "reopen": "Reabrir en el editor",
+    "regenerate": "Regenerar",
+    "delete": "Borrar",
+    "confirmDelete": "Confirmar borrado",
+    "testSheet": "Hoja de prueba",
+    "download": "Descargar {{name}}",
+    "jobStatus": {
+      "queued": "En cola",
+      "running": "En curso",
+      "succeeded": "Terminado",
+      "failed": "Fallido",
+      "cancelled": "Cancelado"
+    }
+  }
+}

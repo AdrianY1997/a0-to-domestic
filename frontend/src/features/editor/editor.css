@@ -1,0 +1,142 @@
+.editor-root {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr) 340px;
+  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'doc preview settings'
+    'summary summary summary';
+  gap: var(--mantine-spacing-sm);
+  height: calc(100dvh - 56px - 2 * var(--mantine-spacing-md));
+  min-height: 480px;
+}
+.editor-doc {
+  grid-area: doc;
+  overflow: auto;
+}
+.editor-preview {
+  grid-area: preview;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.editor-settings {
+  grid-area: settings;
+  overflow: auto;
+}
+.editor-summary {
+  grid-area: summary;
+}
+@media (max-width: 1100px) {
+  .editor-root {
+    grid-template-columns: minmax(0, 1fr) 320px;
+    grid-template-areas:
+      'preview settings'
+      'doc settings'
+      'summary summary';
+    grid-template-rows: minmax(320px, 1fr) auto auto;
+    height: auto;
+  }
+}
+@media (max-width: 720px) {
+  .editor-root {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'preview' 'summary' 'settings' 'doc';
+    grid-template-rows: 60vh auto auto auto;
+  }
+}
+
+.preview-canvas {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  border: 1px solid var(--mantine-color-default-border);
+  border-radius: var(--mantine-radius-md);
+  background: light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-8));
+  overflow: hidden;
+}
+.preview-canvas .react-transform-wrapper,
+.preview-canvas .react-transform-component {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.plan-overlay {
+  width: 100%;
+  height: 100%;
+  display: block;
+  user-select: none;
+}
+.plan-page {
+  fill: #fff;
+  stroke: #888;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.plan-content {
+  fill: rgba(34, 139, 230, 0.06);
+  stroke: #1c7ed6;
+  stroke-width: 1.5;
+}
+.plan-paper {
+  fill: none;
+  stroke: #868e96;
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+}
+.plan-overlap {
+  fill: rgba(250, 176, 5, 0.35);
+}
+.plan-cut {
+  stroke: #e03131;
+  stroke-width: 1.5;
+  stroke-dasharray: 6 4;
+}
+.plan-skip {
+  stroke: #868e96;
+  stroke-width: 1;
+}
+.plan-id {
+  fill: #1864ab;
+  font-weight: 700;
+  paint-order: stroke;
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 0.6px;
+  pointer-events: none;
+}
+.plan-sheet {
+  cursor: pointer;
+  outline: none;
+}
+.plan-sheet:focus-visible .plan-content {
+  stroke: #f08c00;
+  stroke-width: 3;
+}
+.plan-sheet:hover .plan-content {
+  fill: rgba(34, 139, 230, 0.16);
+}
+.plan-sheet--blank,
+.plan-sheet--deselected {
+  opacity: 0.35;
+}
+
+.plan-overlay--grid {
+  cursor: move;
+}
+.plan-overlay--grid .plan-sheet,
+.plan-overlay--region .plan-sheet {
+  cursor: inherit;
+}
+.plan-overlay--region {
+  cursor: crosshair;
+}
+.plan-region {
+  fill: rgba(240, 140, 0, 0.15);
+  stroke: #f08c00;
+  stroke-width: 2;
+  stroke-dasharray: 5 3;
+  pointer-events: none;
+}
+.plan-sheet--deselected .plan-content {
+  fill: rgba(134, 142, 150, 0.12);
+}

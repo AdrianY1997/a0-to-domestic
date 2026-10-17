@@ -1,0 +1,190 @@
+# CI (SPEC 12.1 multi-arch, 15 tests, 17 risks): lint + tests in the dev image, slim/full images
+# for linux/amd64 and linux/arm64 with buildx, E2E, Trivy and an SBOM (syft).
+# Not run from here: it is meant for GitHub Actions only.
+name: ci
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE: ghcr.io/${{ github.repository_owner }}/a0-to-domestic
+  PLATFORMS: linux/amd64,linux/arm64
+
+jobs:
+  # ---------------------------------------------------------------- backend: lint + tests
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build the dev image (all converters, ruff, mypy, pytest)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile
+          target: dev
+          load: true
+          tags: a0td:dev
+          cache-from: type=gha,scope=dev
+          cache-to: type=gha,scope=dev,mode=max
+      - name: Lint, types and tests
+        run: |
+          docker run --rm -v "$PWD/backend:/app/backend" -v "$PWD/fixtures:/app/fixtures:ro" \
+            -w /app/backend a0td:dev sh -c '
+              ruff check . &&
+              ruff format --check . &&
+              mypy src/a0td/domain src/a0td/render &&
+              pytest -q --cov=a0td --cov-report=term-missing:skip-covered'
+      - name: pip-audit
+        run: |
+          docker run --rm -v "$PWD/backend:/app/backend" -w /app/backend a0td:dev sh -c '
+            uv export --frozen --no-dev --no-emit-project -o /tmp/requirements.txt >/dev/null &&
+            uvx pip-audit --requirement /tmp/requirements.txt --no-deps --disable-pip'
+
+  # --------------------------------------------------------------- frontend: lint + tests
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+      - name: npm audit
+        run: npm audit --omit=dev --audit-level=high
+
+  # ----------------------------------------- images: multi-arch build, Trivy, SBOM, push
+  images:
+    needs: [backend, frontend]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [slim, full]
+    permissions:
+      contents: read
+      packages: write
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - name: Version
+        id: version
+        run: echo "value=${GITHUB_REF_NAME//\//-}" >> "$GITHUB_OUTPUT"
+
+      # 1. amd64 image, loaded locally: it is what Trivy, syft and the smoke test look at.
+      - name: Build ${{ matrix.target }} (linux/amd64, loaded)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile
+          target: ${{ matrix.target }}
+          platforms: linux/amd64
+          load: true
+          tags: a0td:${{ matrix.target }}-ci
+          build-args: A0TD_VERSION=${{ steps.version.outputs.value }}
+          cache-from: type=gha,scope=${{ matrix.target }}-amd64
+          cache-to: type=gha,scope=${{ matrix.target }}-amd64,mode=max
+
+      - name: Trivy (fails on fixable HIGH / CRITICAL)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: a0td:${{ matrix.target }}-ci
+          format: table
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+          vuln-type: os,library
+
+      - name: SBOM (syft, SPDX)
+        uses: anchore/sbom-action@v0
+        with:
+          image: a0td:${{ matrix.target }}-ci
+          format: spdx-json
+          output-file: sbom-${{ matrix.target }}.spdx.json
+          upload-artifact: false
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sbom-${{ matrix.target }}
+          path: sbom-${{ matrix.target }}.spdx.json
+
+      # 2. Multi-arch build (amd64 + arm64). Pushed to GHCR only from main and version tags.
+      - name: Log in to GHCR
+        if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Image tags
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE }}
+          flavor: |
+            latest=false
+            suffix=-${{ matrix.target }}
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=sha
+      - name: Build ${{ matrix.target }} (${{ env.PLATFORMS }})
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile
+          target: ${{ matrix.target }}
+          platforms: ${{ env.PLATFORMS }}
+          push: ${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: A0TD_VERSION=${{ steps.version.outputs.value }}
+          provenance: mode=max
+          sbom: true
+          cache-from: type=gha,scope=${{ matrix.target }}-multi
+          cache-to: type=gha,scope=${{ matrix.target }}-multi,mode=max
+
+  # ----------------------------------------------------------------------------------- e2e
+  e2e:
+    needs: [backend, frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Playwright against the hardened full image
+        run: docker compose -f compose.dev.yml --profile e2e run --rm e2e
+      - name: Container smoke test (slim / full / dev)
+        run: bash scripts/container-smoke.sh
+      - name: Collect Playwright reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            e2e/playwright-report
+            e2e/test-results
+          if-no-files-found: ignore
+      - name: Tear down
+        if: always()
+        run: docker compose -f compose.dev.yml --profile e2e down -v

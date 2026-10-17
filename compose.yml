@@ -1,0 +1,18 @@
+services:
+  app:
+    build: { context: ., dockerfile: docker/Dockerfile, target: full }
+    image: a0-to-domestic:latest
+    ports: ["127.0.0.1:8080:8080"]      # solo local; para LAN, quitar 127.0.0.1 y activar A0TD_AUTH_MODE
+    volumes: ["a0data:/data"]
+    environment:
+      A0TD_WORKERS: "2"
+      A0TD_RETENTION_HOURS: "72"
+    read_only: true
+    tmpfs: ["/tmp:size=512m"]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+    mem_limit: 4g
+    cpus: 4
+    restart: unless-stopped
+volumes:
+  a0data:

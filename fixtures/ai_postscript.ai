@@ -1,0 +1,9 @@
+%!PS-Adobe-3.0 EPSF-3.0
+%%Creator: Adobe Illustrator(R) 8.0
+%%BoundingBox: 0 0 595 842
+%%EndComments
+0.5 setlinewidth newpath 20 20 moveto 575 20 lineto 575 822 lineto 20 822 lineto closepath stroke
+1 0 0 setrgbcolor newpath 20 20 moveto 575 822 lineto stroke
+0 setgray /Helvetica findfont 40 scalefont setfont 60 400 moveto (PS fixture) show
+showpage
+%%EOF

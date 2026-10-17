@@ -1,0 +1,65 @@
+# Development environment (SPEC 12.3). Everything runs in containers.
+name: a0td-dev
+services:
+  backend:
+    build: { context: ., dockerfile: docker/Dockerfile, target: dev }
+    image: a0td:dev
+    command: ["uvicorn", "a0td.api.app:create_app", "--factory", "--reload",
+              "--reload-dir", "/app/backend/src", "--host", "0.0.0.0", "--port", "8000"]
+    working_dir: /app/backend
+    ports: ["127.0.0.1:8000:8000"]
+    volumes:
+      - ./backend:/app/backend          # code mounted; the venv lives in /opt/venv (outside the mount)
+      - ./fixtures:/app/fixtures:ro     # test fixtures (tests resolve them at <repo>/fixtures)
+      - a0dev-data:/data
+    environment:
+      A0TD_LOG_FORMAT: text
+      A0TD_LOG_LEVEL: debug
+      A0TD_STATIC_DIR: ""
+    restart: unless-stopped
+
+  frontend:
+    image: node:24-slim
+    working_dir: /app/frontend
+    command: sh -c "npm ci && npm run dev -- --host 0.0.0.0"
+    ports: ["127.0.0.1:5173:5173"]
+    volumes:
+      - ./frontend:/app/frontend
+      - frontend-node-modules:/app/frontend/node_modules
+    environment:
+      VITE_API_TARGET: http://backend:8000
+      API_URL: http://backend:8000   # used by `npm run gen:api`
+    depends_on: [backend]
+
+  # Full image against which the E2E tests run (profile e2e).
+  app-full:
+    profiles: [e2e]
+    build: { context: ., dockerfile: docker/Dockerfile, target: full }
+    image: a0td:full
+    read_only: true
+    tmpfs: ["/tmp:size=512m"]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+    volumes: ["a0e2e-data:/data"]
+
+  e2e:
+    profiles: [e2e]
+    image: mcr.microsoft.com/playwright:v1.55.0-noble   # must match @playwright/test in e2e/package.json
+    working_dir: /app/e2e
+    command: ["sh", "-c", "npm ci --no-audit --no-fund && npx playwright test"]
+    ipc: host
+    volumes:
+      - ./e2e:/app/e2e
+      - ./fixtures:/app/fixtures:ro
+      - e2e-node-modules:/app/e2e/node_modules
+    environment:
+      E2E_BASE_URL: http://app-full:8080
+      E2E_FIXTURES_DIR: /app/fixtures
+    depends_on:
+      app-full: { condition: service_healthy }
+
+volumes:
+  a0dev-data:
+  a0e2e-data:
+  frontend-node-modules:
+  e2e-node-modules:

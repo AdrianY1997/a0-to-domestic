@@ -1,0 +1,16 @@
+{
+  "name": "a0-to-domestic-e2e",
+  "private": true,
+  "license": "AGPL-3.0-or-later",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.55.0",
+    "@types/node": "^24.0.0",
+    "pdf-lib": "^1.17.1",
+    "typescript": "~5.9.0"
+  }
+}

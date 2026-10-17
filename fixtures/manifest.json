@@ -1,0 +1,455 @@
+{
+  "a0_top_half_only.pdf": {
+    "bytes": 22272,
+    "expect": "accept",
+    "format": "pdf",
+    "notes": "content only in top half (blank bottom)",
+    "pages": 1,
+    "size_mm": [
+      841,
+      1189
+    ]
+  },
+  "a0_vector_grid.pdf": {
+    "bytes": 42849,
+    "expect": "accept",
+    "format": "pdf",
+    "notes": "10mm grid, labeled 100mm squares, hairlines",
+    "pages": 1,
+    "size_mm": [
+      841,
+      1189
+    ]
+  },
+  "a1_landscape.pdf": {
+    "bytes": 22219,
+    "expect": "accept",
+    "format": "pdf",
+    "notes": "A1 landscape",
+    "pages": 1,
+    "size_mm": [
+      841,
+      594
+    ]
+  },
+  "ai_pdf.ai": {
+    "bytes": 7166,
+    "expect": "accept",
+    "format": "ai",
+    "notes": "PDF-compatible Illustrator file -> PDF path",
+    "pages": 1,
+    "size_mm": [
+      297,
+      420
+    ]
+  },
+  "ai_postscript.ai": {
+    "bytes": 358,
+    "expect": "accept",
+    "format": "ai",
+    "notes": "PostScript-based Illustrator file -> Ghostscript",
+    "pages": 1,
+    "size_mm": [
+      209.9,
+      297
+    ]
+  },
+  "annotations.pdf": {
+    "bytes": 9698,
+    "expect": "accept",
+    "format": "pdf",
+    "notes": "stamp, freetext, ink annotations + filled text form field",
+    "pages": 1,
+    "size_mm": [
+      297,
+      420
+    ]
+  },
+  "boxes.pdf": {
+    "bytes": 13111,
+    "expect": "accept",
+    "format": "pdf",
+    "notes": "MediaBox 420x594mm; CropBox inset 20mm (effective size); TrimBox inset 30mm; BleedBox inset 25mm",
+    "pages": 1,
+    "size_mm": [
+      380,
+      554
+    ]
+  },
+  "cmyk.jpg": {
+    "bytes": 13418,
+    "expect": "accept",
+    "format": "jpeg",
+    "notes": "CMYK JPEG 400x300 @150dpi",
+    "pages": 1,
+    "size_mm": [
+      67.7,
+      50.8
+    ]
+  },
+  "corrupt.pdf": {
+    "bytes": 11601,
+    "expect": "reject_or_repair",
+    "format": "pdf",
+    "notes": "truncated at 60%, no xref/trailer",
+    "pages": null,
+    "size_mm": null
+  },
+  "djvu_a4_150dpi.djvu": {
+    "bytes": 100759,
+    "expect": "accept",
+    "format": "djvu",
+    "notes": "1240x1754 colour page at 150 dpi (A4)",
+    "pages": 1,
+    "size_mm": [
+      210,
+      297
+    ]
+  },
+  "docx_missing_font.docx": {
+    "bytes": 36696,
+    "expect": "accept",
+    "format": "docx",
+    "notes": "run in font 'Zapfino Imaginary' (not installed): FONTS_SUBSTITUTED",
+    "pages": 1,
+    "size_mm": [
+      210,
+      297
+    ]
+  },
+  "docx_simple.docx": {
+    "bytes": 36647,
+    "expect": "accept",
+    "format": "docx",
+    "notes": "python-docx, A4, default fonts",
+    "pages": 1,
+    "size_mm": [
+      210,
+      297
+    ]
+  },
+  "dwg_model_plan.dwg": {
+    "bytes": 18169,
+    "expect": "accept",
+    "format": "dwg",
+    "notes": "dxf_model_plan.dxf converted to DWG R2000 with LibreDWG dxf2dwg",
+    "pages": 1,
+    "size_mm": null
+  },
+  "dxf_a0_layout.dxf": {
+    "bytes": 40136,
+    "expect": "accept",
+    "format": "dxf",
+    "notes": "paper space layout 'A0 sheet' (1189x841 mm) with frame, title block and a viewport on the plan; layouts: Model, 'A0 sheet'",
+    "pages": 1,
+    "size_mm": [
+      1189,
+      841
+    ]
+  },
+  "dxf_model_plan.dxf": {
+    "bytes": 38689,
+    "expect": "accept",
+    "format": "dxf",
+    "notes": "12000x8000 mm plan in model space ($INSUNITS=4); no paper layout; auto scale 1:20 (page 615x415 mm); explicit 1:50 gives 255x175 mm",
+    "pages": 1,
+    "size_mm": null
+  },
+  "encrypted.pdf": {
+    "bytes": 1253,
+    "expect": "password_required",
+    "format": "pdf",
+    "notes": "user password 'secret'",
+    "pages": 1,
+    "size_mm": [
+      297,
+      420
+    ]
+  },
+  "encrypted_noprint.pdf": {
+    "bytes": 1262,
+    "expect": "permission_denied",
+    "format": "pdf",
+    "notes": "empty user pw, owner pw 'owner-secret', printing not permitted",
+    "pages": 1,
+    "size_mm": [
+      297,
+      420
+    ]
+  },
+  "eps_a4.eps": {
+    "bytes": 333,
+    "expect": "accept",
+    "format": "eps",
+    "notes": "hand-written EPS, BoundingBox 595x842 pt",
+    "pages": 1,
+    "size_mm": [
+      209.9,
+      297
+    ]
+  },
+  "hpgl_plot.plt": {
+    "bytes": 426,
+    "expect": "accept",
+    "format": "hpgl",
+    "notes": "HPGL plot of 841x594 mm; the frame is sized from the pen coordinates plus 0.1 in",
+    "pages": 1,
+    "size_mm": [
+      854.4,
+      606.4
+    ]
+  },
+  "layers_ocg.pdf": {
+    "bytes": 2913,
+    "expect": "accept",
+    "format": "pdf",
+    "notes": "pattern-like shapes in OCG layers 'Talla 38','Talla 40','Talla 42'",
+    "pages": 1,
+    "size_mm": [
+      841,
+      594
+    ]
+  },
+  "malicious/docx_macro.docm": {
+    "bytes": 1345,
+    "expect": "reject",
+    "format": "docm",
+    "notes": "macro-enabled docx with fake vbaProject.bin placeholder (not real VBA)",
+    "pages": 1,
+    "size_mm": null
+  },
+  "malicious/misleading_ext.pdf": {
+    "bytes": 69,
+    "expect": "detect_as_png",
+    "format": "png",
+    "notes": "PNG content with .pdf extension; detect by magic bytes",
+    "pages": 1,
+    "size_mm": null
+  },
+  "malicious/odt_macro.odt": {
+    "bytes": 1855,
+    "expect": "accept_neutralized",
+    "format": "odt",
+    "notes": "ODT whose open event runs a macro writing /tmp/a0td_macro_pwned; macros must stay off",
+    "pages": 1,
+    "size_mm": null
+  },
+  "malicious/pdf_10000_pages.pdf": {
+    "bytes": 948038,
+    "expect": "reject",
+    "format": "pdf",
+    "notes": "10000 tiny pages; must hit page limit",
+    "pages": 10000,
+    "size_mm": [
+      3.5,
+      3.5
+    ]
+  },
+  "malicious/pdf_javascript.pdf": {
+    "bytes": 547,
+    "expect": "accept_neutralized",
+    "format": "pdf",
+    "notes": "OpenAction JavaScript; must be neutralized (never executed)",
+    "pages": 1,
+    "size_mm": [
+      70.6,
+      70.6
+    ]
+  },
+  "malicious/pixel_bomb.png": {
+    "bytes": 69,
+    "expect": "reject",
+    "format": "png",
+    "notes": "header claims 100000x100000 px; tiny file",
+    "pages": 1,
+    "size_mm": null
+  },
+  "malicious/ps_read_passwd.ps": {
+    "bytes": 217,
+    "expect": "reject_or_neutralize",
+    "format": "ps",
+    "notes": "tries to read /etc/passwd and write /tmp (needs -dSAFER)",
+    "pages": 1,
+    "size_mm": null
+  },
+  "malicious/svg_remote_href.svg": {
+    "bytes": 302,
+    "expect": "reject_or_neutralize",
+    "format": "svg",
+    "notes": "remote/file href; must not be fetched",
+    "pages": 1,
+    "size_mm": [
+      100,
+      100
+    ]
+  },
+  "malicious/svg_xxe.svg": {
+    "bytes": 197,
+    "expect": "reject_or_neutralize",
+    "format": "svg",
+    "notes": "external entity file:///etc/passwd",
+    "pages": 1,
+    "size_mm": [
+      100,
+      100
+    ]
+  },
+  "metafile_a4.emf": {
+    "bytes": 12304,
+    "expect": "accept",
+    "format": "emf",
+    "notes": "EMF exported by LibreOffice from an SVG",
+    "pages": 1,
+    "size_mm": null
+  },
+  "metafile_a4.wmf": {
+    "bytes": 15806,
+    "expect": "accept",
+    "format": "wmf",
+    "notes": "WMF exported by LibreOffice from an SVG",
+    "pages": 1,
+    "size_mm": null
+  },
+  "multipage.tif": {
+    "bytes": 1080576,
+    "expect": "accept",
+    "format": "tiff",
+    "notes": "3 pages RGB 300x400 @100dpi",
+    "pages": 3,
+    "size_mm": [
+      76.2,
+      101.6
+    ]
+  },
+  "multipage_mixed.pdf": {
+    "bytes": 71110,
+    "expect": "accept",
+    "format": "pdf",
+    "notes": "pages: A0, A1, A3 (all portrait)",
+    "pages": 3,
+    "size_mm": [
+      841,
+      1189
+    ]
+  },
+  "photo_150dpi.heic": {
+    "bytes": 69268,
+    "expect": "accept",
+    "format": "heif",
+    "notes": "800x600 HEIC with EXIF 150 dpi",
+    "pages": 1,
+    "size_mm": [
+      135.5,
+      101.6
+    ]
+  },
+  "photo_nodpi.avif": {
+    "bytes": 13750,
+    "expect": "accept",
+    "format": "avif",
+    "notes": "800x600 AVIF, no DPI: PHYSICAL_SIZE_ASSUMED",
+    "pages": 1,
+    "size_mm": null
+  },
+  "photo_nodpi.jp2": {
+    "bytes": 126291,
+    "expect": "accept",
+    "format": "jp2",
+    "notes": "800x600 JPEG 2000, no DPI: PHYSICAL_SIZE_ASSUMED",
+    "pages": 1,
+    "size_mm": null
+  },
+  "photo_nodpi.jpg": {
+    "bytes": 597337,
+    "expect": "accept",
+    "format": "jpeg",
+    "notes": "4000x5657 px, no DPI metadata (size must be asked from the user)",
+    "pages": 1,
+    "size_mm": null
+  },
+  "pptx_a0.pptx": {
+    "bytes": 28458,
+    "expect": "accept",
+    "format": "pptx",
+    "notes": "python-pptx, single A0 portrait slide",
+    "pages": 1,
+    "size_mm": [
+      841,
+      1189
+    ]
+  },
+  "ps_a4.ps": {
+    "bytes": 337,
+    "expect": "accept",
+    "format": "ps",
+    "notes": "hand-written PostScript, setpagedevice A4",
+    "pages": 1,
+    "size_mm": [
+      209.9,
+      297
+    ]
+  },
+  "rotated_90.pdf": {
+    "bytes": 7167,
+    "expect": "accept",
+    "format": "pdf",
+    "notes": "A3 portrait mediabox with /Rotate 90 (effective landscape)",
+    "pages": 1,
+    "size_mm": [
+      420,
+      297
+    ]
+  },
+  "scan_a0_200dpi_g4.tif": {
+    "bytes": 228360,
+    "expect": "accept",
+    "format": "tiff",
+    "notes": "1-bit CCITT G4, 200 dpi, 6622x9362",
+    "pages": 1,
+    "size_mm": [
+      840.9,
+      1188.9
+    ]
+  },
+  "svg_no_units.svg": {
+    "bytes": 351,
+    "expect": "accept",
+    "format": "svg",
+    "notes": "viewBox only, no physical units: PHYSICAL_SIZE_ASSUMED, fits A0 landscape (1189x594.5)",
+    "pages": 1,
+    "size_mm": null
+  },
+  "svg_physical.svg": {
+    "bytes": 380,
+    "expect": "accept",
+    "format": "svg",
+    "notes": "width/height in mm",
+    "pages": 1,
+    "size_mm": [
+      200,
+      100
+    ]
+  },
+  "transparent.png": {
+    "bytes": 1232,
+    "expect": "accept",
+    "format": "png",
+    "notes": "RGBA gradient alpha, 400x300 @150dpi",
+    "pages": 1,
+    "size_mm": [
+      67.7,
+      50.8
+    ]
+  },
+  "xps_a4.xps": {
+    "bytes": 1506,
+    "expect": "accept",
+    "format": "xps",
+    "notes": "hand-written XPS, A4 landscape, two paths",
+    "pages": 1,
+    "size_mm": [
+      297,
+      210
+    ]
+  }
+}
