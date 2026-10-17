@@ -231,6 +231,14 @@ Auditorías:
 
 El aislamiento de `test_printing` queda confirmado en la suite completa.
 
+Post-cierre (2026-10-17):
+
+- Repo público https://github.com/AdrianY1997/a0-to-domestic (AGPL-3.0).
+- Red de conversores endurecida (SPEC §14):
+  - `office_sanitize.py`.
+  - `unshare --net` automático si el seccomp lo permite.
+  - Tests en `test_convert_network.py`.
+
 Pendientes:
 
 - Archivo `LICENSE` (decisión del usuario; la spec adopta AGPL-3.0, D1).

@@ -17,7 +17,7 @@ dependencies = [
   "alembic",
   "python-multipart",
   "pymupdf",
-  "pyvips",
+  "pyvips[binary]",
   "pillow",
   "pillow-heif",
   "numpy",

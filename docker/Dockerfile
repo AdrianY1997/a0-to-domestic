@@ -31,6 +31,9 @@ RUN curl -fsSL -o libredwg.tar.xz \
  && strip --strip-unneeded /opt/libredwg/bin/* /opt/libredwg/lib/*.so* || true
 RUN /opt/libredwg/bin/dwg2dxf --version
 
+# ---------------------------------------------------------------- uv (build tool only; not kept in slim/full)
+FROM ghcr.io/astral-sh/uv:0.8 AS uv
+
 # ---------------------------------------------------------------- base
 FROM ${PYTHON_IMAGE} AS base
 ARG A0TD_VERSION=0.1.0
@@ -43,15 +46,18 @@ ENV DEBIAN_FRONTEND=noninteractive \
     UV_PYTHON_DOWNLOADS=never \
     PATH=/opt/venv/bin:$PATH
 
-# libvips (pyvips has no bundled binary), tini, basic fonts. Names checked against Debian trixie
-# (libvips42t64 is the t64-renamed runtime library).
+# libvips comes from the pyvips-binary wheel (pyvips[binary]); png/jpeg/tiff/gif/webp are enough there:
+# HEIF/AVIF/JP2 go through pillow-heif / Pillow and PDF through PyMuPDF. Only tini, the CA bundle and the
+# basic fonts are needed here (the big Noto set is installed in full-tools only).
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
-      tini ca-certificates libvips42t64 \
-      fonts-dejavu-core fonts-liberation fonts-crosextra-carlito fonts-crosextra-caladea fonts-noto-core \
- && rm -rf /var/lib/apt/lists/*
-
-COPY --from=ghcr.io/astral-sh/uv:0.8 /uv /usr/local/bin/uv
+      tini ca-certificates \
+      fonts-dejavu-core fonts-liberation fonts-crosextra-carlito fonts-crosextra-caladea \
+ && rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man /usr/share/info /usr/share/lintian \
+ && rm -rf /usr/local/lib/python3.13/ensurepip /usr/local/lib/python3.13/idlelib \
+           /usr/local/lib/python3.13/turtledemo /usr/local/lib/python3.13/test \
+           /usr/local/lib/python3.13/site-packages/pip* /usr/local/lib/python3.13/site-packages/setuptools* \
+           /usr/local/lib/python3.13/site-packages/wheel* /usr/local/bin/pip*
 
 RUN groupadd --gid 10001 app \
  && useradd --uid 10001 --gid 10001 --no-create-home --home-dir /tmp/home --shell /usr/sbin/nologin app \
@@ -61,8 +67,10 @@ RUN groupadd --gid 10001 app \
 WORKDIR /app/backend
 # Dependencies only (layer cached until the lockfile changes).
 COPY backend/pyproject.toml backend/uv.lock ./
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-dev --no-install-project
+RUN --mount=type=cache,target=/root/.cache/uv --mount=from=uv,source=/uv,target=/usr/local/bin/uv \
+    uv sync --frozen --no-dev --no-install-project \
+ && find /opt/venv -type d \( -name tests -o -name test \) -path '*/site-packages/*' -prune -exec rm -rf {} + \
+ && find /opt/venv -name '*.pyi' -delete
 
 ENV HOME=/tmp/home \
     XDG_CACHE_HOME=/tmp/cache \
@@ -80,7 +88,7 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends ghostscript qpdf librsvg2-bin \
  && rm -rf /var/lib/apt/lists/*
 COPY backend/ /app/backend/
-RUN --mount=type=cache,target=/root/.cache/uv \
+RUN --mount=type=cache,target=/root/.cache/uv --mount=from=uv,source=/uv,target=/usr/local/bin/uv \
     uv sync --frozen --no-dev --no-editable
 COPY --from=frontend-build /src/dist /app/static
 COPY docker/entrypoint.sh /app/entrypoint.sh
@@ -100,7 +108,7 @@ USER root
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
       libreoffice-writer libreoffice-calc libreoffice-impress libreoffice-draw \
-      inkscape djvulibre-bin \
+      inkscape djvulibre-bin fonts-noto-core \
       python3-lxml python3-numpy python3-pyparsing python3-tinycss2 python3-cssselect \
  && rm -rf /var/lib/apt/lists/*
 # LibreDWG: dwg2dxf + shared library
@@ -127,6 +135,7 @@ RUN ln -s ../lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
 # Dev group (pytest, ruff, mypy...) and an editable install; ./backend is bind-mounted over
 # /app/backend at runtime, the venv lives outside the mount in /opt/venv.
 ENV UV_COMPILE_BYTECODE=0
+COPY --from=uv /uv /usr/local/bin/uv
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --group dev \
  && chown -R app:app /opt/venv

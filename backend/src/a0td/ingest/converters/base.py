@@ -1,6 +1,7 @@
 """Converter protocol (SPEC 7.2) and the subprocess helper used by external-tool converters."""
 
 import contextlib
+import functools
 import logging
 import os
 import shutil
@@ -99,6 +100,47 @@ def _with_memory_limit(args: list[str], memory_mb: int | None) -> list[str]:
     return ["prlimit", f"--as={memory_mb * 1024 * 1024}", "--", *args]
 
 
+_NO_NET_ENV = "A0TD_CONVERTER_NO_NETWORK"
+
+
+@functools.lru_cache(maxsize=1)
+def _network_isolation_prefix() -> tuple[str, ...]:
+    """``unshare`` prefix giving a converter an empty network namespace, or ``()``.
+
+    Needs unprivileged user namespaces, which Docker's default seccomp profile denies (SPEC 14):
+    the probe fails under the shipped hardening and works wherever the runtime allows ``unshare``
+    (e.g. a custom seccomp profile). Disabled with ``A0TD_CONVERTER_NO_NETWORK=false``.
+    """
+    if os.name != "posix" or os.environ.get(_NO_NET_ENV, "true").strip().lower() in _FALSE:
+        return ()
+    exe = shutil.which("unshare")
+    if exe is None:
+        log.warning("unshare not found: converters keep network access")
+        return ()
+    prefix = (
+        exe,
+        "--user",
+        "--net",
+        f"--map-user={os.getuid()}",
+        f"--map-group={os.getgid()}",
+        "--",
+    )
+    try:
+        ok = subprocess.run([*prefix, "true"], capture_output=True, timeout=10).returncode == 0
+    except (OSError, subprocess.SubprocessError):
+        ok = False
+    if not ok:
+        log.warning(
+            "network namespaces unavailable (seccomp / user namespaces denied): "
+            "converters keep network access"
+        )
+        return ()
+    return prefix
+
+
+_FALSE = frozenset({"0", "false", "no", "off"})
+
+
 def run_tool(
     argv: Sequence[str | os.PathLike[str]],
     *,
@@ -108,9 +150,11 @@ def run_tool(
     memory_mb: int | None = None,
     env: dict[str, str] | None = None,
     ok_codes: Sequence[int] = (0,),
+    no_network: bool = True,
 ) -> ToolResult:
     """Run an external converter (SPEC 7.2 / 14): argv list (no shell), timeout, ``prlimit --as``,
-    ``HOME`` / ``TMPDIR`` inside ``scratch``. The whole process group is killed on timeout.
+    ``HOME`` / ``TMPDIR`` inside ``scratch``, and (when the runtime allows it) an empty network
+    namespace unless ``no_network=False``. The whole process group is killed on timeout.
 
     Raises ``CONVERSION_TIMEOUT`` or ``CONVERSION_FAILED`` (return code not in ``ok_codes``).
     """
@@ -132,7 +176,10 @@ def run_tool(
     try:
         with out_path.open("wb") as out_fh, err_path.open("wb") as err_fh:
             proc = subprocess.Popen(
-                _with_memory_limit(args, memory_mb),
+                [
+                    *(_network_isolation_prefix() if no_network else ()),
+                    *_with_memory_limit(args, memory_mb),
+                ],
                 stdin=subprocess.DEVNULL,
                 stdout=out_fh,
                 stderr=err_fh,

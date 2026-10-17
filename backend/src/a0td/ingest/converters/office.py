@@ -18,6 +18,7 @@ from a0td.ingest.converters.common import (
     stage_input,
     tool_env,
 )
+from a0td.ingest.converters.office_sanitize import sanitize_package
 from a0td.ingest.models import CanonicalDocument, DocFormat
 
 XCU_TEMPLATE = Path("/usr/share/a0td/registrymodifications.xcu")
@@ -171,6 +172,7 @@ class OfficeConverter:
         scratch = ctx.scratch_dir(work)
         env = tool_env(ctx, scratch)
         staged = stage_input(src, scratch, f"input.{fmt.value}")
+        sanitize_package(staged)  # no remote / linked content reaches LibreOffice
         out_dir = fresh_dir(scratch / "lo-out")
         ctx.report("convert", 5, "ingest.convert", tool="libreoffice")
         pdf = out_dir / "input.pdf"

@@ -915,9 +915,15 @@ Todos los archivos subidos se tratan como **no confiables**.
   `frame-ancestors 'none'`, `Referrer-Policy: no-referrer`. Sin CORS (mismo origen). Con
   `AUTH_MODE=password`: cookie `HttpOnly; SameSite=Strict`, token CSRF y límite de intentos de login.
 - **Importación por URL:** no se implementa, para evitar SSRF.
-- **Red en conversiones:** LibreOffice no bloquea por sí mismo los recursos remotos enlazados en OOXML. En F3
-  los conversores se ejecutarán sin salida de red: espacio de nombres de red propio, o servicio conversor en
-  una red `internal: true`. Hasta entonces, se recomienda desplegar el contenedor sin acceso a Internet.
+- **Red en conversiones.** Hay tres capas de protección:
+  1. **Saneado del documento.** `office_sanitize.py` elimina las relaciones externas de OOXML y los
+     `xlink:href` remotos de ODF antes de llamar a LibreOffice. Además, el perfil de LibreOffice nunca
+     actualiza enlaces y bloquea los referers no confiables.
+  2. **Aislamiento de red por proceso.** `run_tool` antepone `unshare --user --net` si el kernel lo permite.
+     Con el seccomp por defecto de Docker no está permitido, y entonces se ejecuta sin envolver y lo
+     registra en el log. Para activarlo hace falta un perfil seccomp que permita user namespaces.
+     `A0TD_CONVERTER_NO_NETWORK=false` lo desactiva.
+  3. **Despliegue sin salida a Internet.** Es la recomendación para quien no use impresión IPP.
 - **Cadena de suministro:** dependencias fijadas (`uv.lock`, `package-lock.json`), imagen base fijada por
   digest. En CI: `pip-audit`, `npm audit`, Trivy sobre la imagen y SBOM con syft.
 - **Permisos PDF:** se respetan; no se elude ninguna restricción.
@@ -1060,6 +1066,53 @@ E2E → Trivy y SBOM. Benchmarks de §13 cada noche con umbrales.
 | Licencias AGPL (PyMuPDF, Ghostscript) y GPL (LibreDWG, Inkscape) | Obligaciones al distribuir | Decisión D1; página de licencias de terceros |
 | Tamaño de la imagen `full` | Descarga lenta | Targets `slim` y `full`, `--no-install-recommends` |
 | Docker Desktop en Windows: sin mDNS ni inotify en bind mounts | IPP y carpeta vigilada | URI IPP manual; sondeo en la carpeta vigilada |
+
+## 17bis. Modo web local (WP-21)
+
+Versión gratuita publicada en **GitHub Pages**. Todo se procesa y guarda en el navegador del usuario y no
+se sube ningún archivo.
+
+- **Motor.** Pyodide 0.29.5 (Python 3.13) en un Web Worker, con PyMuPDF (wheel de Pyodide), pydantic,
+  numpy, Pillow y pillow-heif. Ejecuta el mismo paquete `a0td` (dominio, ingesta y render) que la versión
+  Docker. No hay segunda implementación.
+- **Puente** `a0td.web.bridge`. Son funciones sin E/S de red que trabajan sobre el FS en memoria de
+  Pyodide y devuelven JSON con las mismas formas que la API REST (§10):
+  - `info()`, `papers()`, `presets()`, `printers()`
+  - `ingest(src_path, name, password=None, options=None)` → `Document`
+  - `set_physical_size(doc_id, page, **size)`
+  - `page_preview(doc_id, page, max_px, hidden_layers, visible_layers)` → PNG
+  - `plan(settings_json, page_index, include_alternatives, preset_id)` → `Plan`
+  - `sheet_preview(settings_json, page_index, sheet_id, max_px)` → PNG
+  - `render(settings_json, preset_id, test_sheet_only)` → `{outputs: [{name, path, kind, pages, size_bytes}], plans, warnings, ink}`
+  - `calibration_pdf(paper, locale)`
+
+  El progreso llega por un callback JS.
+- **Adaptadores.**
+  - `a0td.imaging` (`vips_compat`): Pillow y numpy en lugar de pyvips cuando pyvips no existe. En Docker
+    se sigue usando pyvips.
+  - La configuración no requiere `pydantic-settings` en web.
+  - Las vistas previas van en PNG.
+  - Los conversores con subproceso se declaran no disponibles.
+- **Formatos en web.** PDF, raster (PNG, JPEG, TIFF incluido G4, WebP, GIF, BMP, HEIC/AVIF), SVG y XPS
+  mediante MuPDF, y DXF mediante ezdxf si carga en Pyodide. El resto muestra "Disponible en la versión
+  Docker".
+- **Frontend.** `client.ts` se vuelve conectable: con `VITE_MODE=local` habla con el worker en lugar de
+  hablar con `/api/v1`. El almacenamiento está en IndexedDB:
+  - documentos (original y artefactos canónicos);
+  - trabajos (salidas en blobs);
+  - presets, impresoras y ajustes.
+
+  La retención y el borrado funcionan como en el servidor. IPP, la carpeta vigilada, la autenticación y
+  las métricas no existen en este modo.
+- **Rendimiento y caché.**
+  - Pyodide, las wheels y `a0td.zip` se sirven desde el propio sitio (`/py/`), sin CDN de terceros.
+  - Un service worker cachea unos 28 MB para usar la app offline después de la primera visita.
+  - El arranque de Pyodide empieza al abrir la app y muestra el progreso.
+- **Límites.** El tope de PPP y megapíxeles es más bajo en web (memoria wasm32) y se avisa con `LOCAL_LIMIT`.
+- **Despliegue.** Workflow `.github/workflows/pages.yml`:
+  1. construye el paquete web (`tools/build_web_bundle.py`);
+  2. compila el frontend en modo local con `base` igual al nombre del repo;
+  3. publica en Pages.
 
 ## 18. Decisiones (adoptadas por defecto)
 

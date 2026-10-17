@@ -13,7 +13,10 @@ que diga PROGRESS.md (es más reciente) y avisa al orquestador.
 4. Todo se ejecuta en Docker. Nada de instalar dependencias en el host.
 5. Formatea y lintéa **solo tus archivos** (`ruff format <tus rutas>`), nunca `ruff format .`, porque
    hay otros agentes editando en paralelo. Para comprobar, usa `ruff format --check .`.
-6. Informe final breve: archivos, resultado de tests, desviaciones con su porqué. Sin volcar código.
+6. El proyecto es un repo git público (https://github.com/AdrianY1997/a0-to-domestic, AGPL-3.0). **Nunca
+   hagas commit, push ni cambies de rama**: los commits los hace el orquestador. `.claude/` y `spike/` están
+   en `.gitignore`.
+7. Informe final breve: archivos, resultado de tests, desviaciones con su porqué. Sin volcar código.
 
 ## Comandos
 
