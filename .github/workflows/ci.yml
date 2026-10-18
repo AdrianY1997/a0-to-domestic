@@ -68,7 +68,7 @@ jobs:
             -e HOME=/tmp/home -e XDG_CACHE_HOME=/tmp/cache -e UV_CACHE_DIR=/tmp/uv-cache-ci \
             -v "$PWD/backend:/app/backend" -w /app/backend a0td:dev sh -c '
             uv export --frozen --no-dev --no-emit-project -o /tmp/requirements.txt >/dev/null &&
-            uvx pip-audit --requirement /tmp/requirements.txt --no-deps --disable-pip'
+            uv tool run pip-audit --requirement /tmp/requirements.txt --no-deps --disable-pip'
 
   # --------------------------------------------------------------- frontend: lint + tests
   frontend:
