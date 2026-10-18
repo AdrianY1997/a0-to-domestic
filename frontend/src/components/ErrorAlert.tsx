@@ -1,6 +1,8 @@
 import { Alert, List } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
+import { ApiError } from '../api/client';
 import { apiErrorMessage, fieldErrors } from '../lib/errors';
+import { DockerLink, isDockerOnlyError } from './DockerHint';
 
 interface Props {
   error: unknown;
@@ -14,6 +16,12 @@ export function ErrorAlert({ error, title }: Props) {
   return (
     <Alert color="red" title={title ?? t('common.error')} role="alert">
       {apiErrorMessage(t, error)}
+      {error instanceof ApiError && isDockerOnlyError(error.code) && (
+        <>
+          {' '}
+          <DockerLink />
+        </>
+      )}
       {fields.length > 0 && (
         <List size="xs" mt="xs">
           {fields.map((f) => (

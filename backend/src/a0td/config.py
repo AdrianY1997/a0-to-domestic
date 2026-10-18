@@ -5,7 +5,11 @@ from pathlib import Path
 from typing import Literal
 
 from pydantic import Field, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+
+try:
+    from pydantic_settings import BaseSettings, SettingsConfigDict
+except ImportError:  # the in-browser build (SPEC 17bis) ships without pydantic-settings
+    from a0td._settings_shim import BaseSettings, SettingsConfigDict
 
 
 class AppConfig(BaseSettings):

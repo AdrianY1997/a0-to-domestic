@@ -11,7 +11,7 @@
 import contextlib
 import math
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import Any
 
 import pymupdf
 from PIL import Image
@@ -22,6 +22,7 @@ from a0td.domain.page import Box
 from a0td.domain.plan import PlanWarning
 from a0td.domain.settings import SourceBox
 from a0td.domain.units import pt_to_mm
+from a0td.imaging import backend_name, icc_supported, vips
 from a0td.ingest.converters.base import ConvertContext, run_tool, tool_available
 from a0td.ingest.models import (
     CANONICAL_PDF,
@@ -29,9 +30,6 @@ from a0td.ingest.models import (
     CanonicalPage,
     DocFormat,
 )
-
-if TYPE_CHECKING:  # pragma: no cover
-    import pyvips
 
 _QPDF_OK = (0, 3)  # 3 = finished with warnings (what a repaired file yields)
 _SKIP_ANNOT_TYPES = frozenset({"Popup", "Link"})
@@ -307,19 +305,16 @@ def _pillow_dpi(src: Path, index: int) -> tuple[float, float] | None:
     return round(x, 4), round(y, 4)
 
 
-def _load_vips(src: Path, index: int, fmt: DocFormat, *, random: bool) -> "pyvips.Image":
-    import pyvips
-
+def _load_vips(src: Path, index: int, fmt: DocFormat, *, random: bool) -> Any:
     kwargs: dict[str, object] = {"access": "random" if random else "sequential"}
     if fmt is DocFormat.TIFF:
         kwargs["page"] = index
-    return pyvips.Image.new_from_file(str(src), **kwargs)
+    return vips.Image.new_from_file(str(src), **kwargs)
 
 
-def _load_pillow(src: Path, limit_px: int) -> "pyvips.Image":
+def _load_pillow(src: Path, limit_px: int) -> Any:
     """Fallback loader for formats libvips cannot read here (BMP): through Pillow + numpy."""
     import numpy as np
-    import pyvips
     from PIL import ImageOps
 
     with Image.open(src) as img:
@@ -337,16 +332,16 @@ def _load_pillow(src: Path, limit_px: int) -> "pyvips.Image":
             img = img.convert("RGB")
         arr = np.ascontiguousarray(np.asarray(img))
     bands = 1 if arr.ndim == 2 else arr.shape[2]
-    out = pyvips.Image.new_from_memory(arr.tobytes(), arr.shape[1], arr.shape[0], bands, "uchar")
+    out = vips.Image.new_from_memory(arr.tobytes(), arr.shape[1], arr.shape[0], bands, "uchar")
     interp = "b-w" if bands <= 2 else "srgb"
     out = out.copy(interpretation=interp)
     if bilevel:
         out = out.copy()
-        out.set_type(pyvips.GValue.gint_type, "bits-per-sample", 1)
+        out.set_type(vips.GValue.gint_type, "bits-per-sample", 1)
     return out
 
 
-def _is_bilevel(im: "pyvips.Image") -> bool:
+def _is_bilevel(im: Any) -> bool:
     return (
         im.bands == 1
         and bool(im.get_typeof("bits-per-sample"))
@@ -354,8 +349,12 @@ def _is_bilevel(im: "pyvips.Image") -> bool:
     )
 
 
-def _normalize(im: "pyvips.Image") -> "pyvips.Image":
-    """Convert to 8-bit sRGB or 8-bit gray, alpha flattened on white (SPEC 7.3)."""
+def _normalize(im: Any, notes: set[str] | None = None) -> Any:
+    """Convert to 8-bit sRGB or 8-bit gray, alpha flattened on white (SPEC 7.3).
+
+    ``notes`` collects ``"icc"`` when a colour profile (or CMYK) could only be approximated
+    because the imaging backend has no colour engine (``ICC_IGNORED``).
+    """
     interp = str(im.interpretation)
     if interp not in _SIMPLE_INTERPRETATIONS:
         im = im.colourspace("srgb")
@@ -363,6 +362,8 @@ def _normalize(im: "pyvips.Image") -> "pyvips.Image":
     if im.format != "uchar":
         im = (im / 257.0).rint().cast("uchar") if im.format == "ushort" else im.cast("uchar")
     if interp == "cmyk":
+        if notes is not None and not icc_supported():
+            notes.add("icc")
         alpha = im.extract_band(4) if im.bands > 4 else None
         rgb = im.extract_band(0, n=4).icc_transform(
             "srgb", input_profile="cmyk", embedded=True, black_point_compensation=True
@@ -382,6 +383,8 @@ def _normalize(im: "pyvips.Image") -> "pyvips.Image":
     if im.get_typeof("icc-profile-data"):
         profile = im.get("icc-profile-data")
         if isinstance(profile, bytes) and b"sRGB" not in profile:
+            if notes is not None and not icc_supported():
+                notes.add("icc")
             with contextlib.suppress(Exception):  # unusable profile: keep the pixel values
                 im = im.icc_transform("srgb", embedded=True)
     return im
@@ -390,28 +393,24 @@ def _normalize(im: "pyvips.Image") -> "pyvips.Image":
 def _page_count(src: Path, fmt: DocFormat) -> int:
     if fmt is not DocFormat.TIFF:
         return 1
-    import pyvips
-
     try:
-        head = pyvips.Image.new_from_file(str(src), access="sequential")
+        head = vips.Image.new_from_file(str(src), access="sequential")
         if head.get_typeof("n-pages"):
             return max(1, int(head.get("n-pages")))
-    except pyvips.Error as exc:
+    except vips.Error as exc:
         raise DomainError(ErrorCode.CORRUPT_FILE, "the TIFF cannot be read") from exc
     return 1
 
 
 def _convert_raster_page(
-    src: Path, index: int, out: Path, fmt: DocFormat, ctx: ConvertContext
+    src: Path, index: int, out: Path, fmt: DocFormat, ctx: ConvertContext, notes: set[str]
 ) -> CanonicalPage:
-    import pyvips
-
     limit_px = ctx.config.max_megapixels * 1_000_000
     try:
         try:
             im = _load_vips(src, index, fmt, random=False)
-        except pyvips.Error:
-            if fmt is not DocFormat.BMP:
+        except vips.Error:
+            if fmt is not DocFormat.BMP or backend_name() != "pyvips":
                 raise
             im = _load_pillow(src, limit_px)
         if im.width < 1 or im.height < 1 or im.width * im.height > limit_px:
@@ -423,7 +422,7 @@ def _convert_raster_page(
         if im.get_typeof("orientation") and int(im.get("orientation")) > 1:
             im = _load_vips(src, index, fmt, random=True).autorot()
         bilevel = _is_bilevel(im)
-        im = _normalize(im)
+        im = _normalize(im, notes)
         width, height = im.width, im.height
         save_kwargs: dict[str, object] = {
             "tile": True,
@@ -441,7 +440,13 @@ def _convert_raster_page(
         im.tiffsave(str(out), **save_kwargs)
     except DomainError:
         raise
-    except pyvips.Error as exc:
+    except vips.Error as exc:
+        if type(exc).__name__ == "PixelLimitError":  # Pillow backend: decompression-bomb guard
+            raise DomainError(
+                ErrorCode.PIXEL_LIMIT_EXCEEDED,
+                f"image has too many pixels, the limit is {ctx.config.max_megapixels} Mpx",
+                params={"limit_mpx": ctx.config.max_megapixels},
+            ) from exc
         raise DomainError(ErrorCode.CORRUPT_FILE, f"cannot decode the image: {exc}") from exc
     dpi = _pillow_dpi(src, index)
     return CanonicalPage(index=index, px=(width, height), dpi_meta=dpi, file=out)
@@ -451,9 +456,7 @@ def canonicalize_raster(
     src: Path, work: Path, ctx: ConvertContext, fmt: DocFormat
 ) -> CanonicalDocument:
     """Image -> ``work/page-{n}.tif`` per page (SPEC 7.3). Sizes are resolved later by analysis."""
-    import pyvips
-
-    pyvips.cache_set_max(0)
+    vips.cache_set_max(0)
     cfg = ctx.config
     n_pages = _page_count(src, fmt)
     if n_pages > cfg.max_pages:
@@ -463,8 +466,10 @@ def canonicalize_raster(
             params={"pages": n_pages, "limit": cfg.max_pages},
         )
     pages: list[CanonicalPage] = []
+    notes: set[str] = set()
     for i in range(n_pages):
         out = work / f"page-{i}.tif"
-        pages.append(_convert_raster_page(src, i, out, fmt, ctx))
+        pages.append(_convert_raster_page(src, i, out, fmt, ctx, notes))
         ctx.report("convert", 5 + 40 * (i + 1) / n_pages, "ingest.page", k=i + 1, n=n_pages)
-    return CanonicalDocument(kind="raster", source_format=fmt, pages=pages)
+    warnings = [PlanWarning(code=WarningCode.ICC_IGNORED)] if "icc" in notes else []
+    return CanonicalDocument(kind="raster", source_format=fmt, pages=pages, warnings=warnings)

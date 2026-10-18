@@ -3,10 +3,10 @@
 import io
 from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import pytest
-import pyvips
 from PIL import Image
 
 from a0td.config import AppConfig
@@ -14,6 +14,7 @@ from a0td.domain.errors import DomainError, ErrorCode, WarningCode
 from a0td.domain.geometry import Rect
 from a0td.domain.planner import plan
 from a0td.domain.settings import JobSettings
+from a0td.imaging import backend_name, vips
 from a0td.ingest import (
     DocFormat,
     DpiSource,
@@ -40,8 +41,8 @@ def _codes(page: Page) -> set[str]:
     return {w.code.value for w in page.warnings}
 
 
-def _tif(workdir: Path, index: int = 0) -> pyvips.Image:
-    return pyvips.Image.new_from_file(str(workdir / f"page-{index}.tif"))
+def _tif(workdir: Path, index: int = 0) -> Any:
+    return vips.Image.new_from_file(str(workdir / f"page-{index}.tif"))
 
 
 def _pixels(workdir: Path, index: int = 0) -> np.ndarray:
@@ -83,8 +84,9 @@ def test_g4_scan_stays_one_bit_and_tiled(ingested: Ingested) -> None:
     assert not page.has_text
     with Image.open(workdir / "page-0.tif") as img:
         assert img.mode == "1"
-        assert img.tag_v2[322] == 256  # TileWidth
-        assert img.tag_v2[259] in (8, 32946)  # deflate
+        if backend_name() == "pyvips":  # the Pillow backend writes strips (no tiled TIFF)
+            assert img.tag_v2[322] == 256  # TileWidth
+        assert img.tag_v2[259] in (8, 32946, 4)  # deflate (Pillow backend: Group 4 for 1-bit)
     assert (page_dir(workdir, 0) / "preview.webp").is_file()
 
 
@@ -161,6 +163,7 @@ def test_multipage_tiff(ingested: Ingested) -> None:
 def test_sixteen_bit_becomes_eight(tmp_path: Path) -> None:
     ramp = np.tile(np.linspace(0, 65535, 64, dtype=np.uint16), (32, 1))
     rgb = np.stack([ramp, ramp // 2, np.zeros_like(ramp)], axis=2)
+    pyvips = pytest.importorskip("pyvips")  # 16-bit TIFF fixture: Pillow cannot write one
     pyvips.Image.new_from_memory(rgb.tobytes(), 64, 32, 3, "ushort").copy(
         interpretation="rgb16"
     ).tiffsave(str(tmp_path / "deep.tif"), xres=100 / 25.4, yres=100 / 25.4, resunit="inch")
@@ -176,6 +179,7 @@ def test_sixteen_bit_becomes_eight(tmp_path: Path) -> None:
 
 def test_sixteen_bit_gray(tmp_path: Path) -> None:
     ramp = np.tile(np.linspace(0, 65535, 64, dtype=np.uint16), (32, 1))
+    pyvips = pytest.importorskip("pyvips")
     pyvips.Image.new_from_memory(ramp.tobytes(), 64, 32, 1, "ushort").copy(
         interpretation="grey16"
     ).tiffsave(str(tmp_path / "gray16.tif"), xres=3.0, yres=3.0)

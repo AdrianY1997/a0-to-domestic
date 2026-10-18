@@ -41,7 +41,7 @@ def test_papers(client: TestClient) -> None:
 
 
 def test_problem_json_for_domain_error() -> None:
-    app: FastAPI = create_app(AppConfig())
+    app: FastAPI = create_app(AppConfig(static_dir=None))
 
     @app.get("/boom")
     def boom() -> None:
@@ -64,7 +64,7 @@ def test_unknown_route_is_problem_json(client: TestClient) -> None:
 
 
 def test_validation_error_is_problem_json() -> None:
-    app = create_app(AppConfig())
+    app = create_app(AppConfig(static_dir=None))
 
     @app.get("/need-int")
     def need_int(n: int) -> int:

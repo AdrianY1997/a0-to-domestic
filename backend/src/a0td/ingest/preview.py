@@ -6,6 +6,8 @@ import numpy as np
 import pymupdf
 from PIL import Image
 
+from a0td.imaging import vips
+
 THUMB_PX = 512
 PREVIEW_FILE = "preview.webp"
 THUMB_FILE = "thumb.webp"
@@ -26,9 +28,7 @@ def _render_pdf(pdf_path: Path, index: int, max_px: int) -> Image.Image:
 
 
 def _render_raster(tif_path: Path, max_px: int) -> Image.Image:
-    import pyvips
-
-    im = pyvips.Image.thumbnail(str(tif_path), max_px, height=max_px, size="down")
+    im = vips.Image.thumbnail(str(tif_path), max_px, height=max_px, size="down")
     if im.bands > 3:
         im = im.flatten(background=[255, 255, 255])
     arr = np.frombuffer(im.write_to_memory(), dtype=np.uint8).reshape(im.height, im.width, im.bands)

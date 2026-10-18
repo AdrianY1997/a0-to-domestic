@@ -234,6 +234,24 @@ El aislamiento de `test_printing` queda confirmado en la suite completa.
 Post-cierre (2026-10-17):
 
 - Repo público https://github.com/AdrianY1997/a0-to-domestic (AGPL-3.0).
+- `slim` = 585 MB en disco (838 MB en la métrica de `docker images`, que suma descomprimido y comprimido).
+  Se usa `pyvips[binary]` en vez del libvips del sistema; las fuentes Noto solo van en full. Objetivo cumplido.
+- CI: el primer run falló por permisos de caché en la imagen `dev` (UID 10001 frente al checkout del runner).
+  Corrigiéndose.
+- WP-21 (modo web local en GitHub Pages, SPEC §17bis):
+  - **21a Python ✅.** Backend 962 tests; con `A0TD_IMAGING=pillow`, 171. Smoke en Pyodide: 18/18 pasos (22 páginas). Incluye:
+    - fachada `a0td.imaging` (pyvips o Pillow);
+    - puente `a0td.web.bridge` (firmas en AGENTS.md);
+    - `tools/build_web_bundle.py` y `tools/vendor_pyodide.py` (Pyodide 0.29.5);
+    - `scripts/web-smoke.sh`.
+  - **21b frontend ✅.** 231 tests; build en modo servidor y local. Probado de verdad en el navegador: ingesta, plan, render y persistencia tras recargar. Incluye:
+    - transporte conectable;
+    - worker de Pyodide;
+    - IndexedDB;
+    - service worker;
+    - HashRouter;
+    - `.github/workflows/pages.yml`.
+  - Pendientes antes de publicar: 23 errores de mypy nuevos (numpy) y wiring de `ICC_IGNORED`/`LOCAL_LIMIT`.
 - Red de conversores endurecida (SPEC §14):
   - `office_sanitize.py`.
   - `unshare --net` automático si el seccomp lo permite.

@@ -232,7 +232,7 @@ def test_merge_over_custom_base() -> None:
 
 def test_error_codes() -> None:
     assert len(ErrorCode) == 27
-    assert len(WarningCode) == 15
+    assert len(WarningCode) == 17
     err = DomainError(ErrorCode.INVALID_SETTINGS, "bad", {"field": "x"})
     assert err.code is ErrorCode.INVALID_SETTINGS
     assert err.params == {"field": "x"}

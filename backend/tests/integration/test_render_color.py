@@ -7,10 +7,10 @@ from typing import Any
 import numpy as np
 import pymupdf
 import pytest
-import pyvips
 from numpy.typing import NDArray
 
 from a0td.domain.settings import ColorSettings
+from a0td.imaging import vips
 from a0td.render import RenderResult
 from a0td.render.color import GRAY_CACHE_NAME, apply_color, whiten
 from a0td.render.engine import render_sheet_preview
@@ -30,7 +30,7 @@ def _rgb(page: pymupdf.Page) -> NDArray[np.uint8]:
 def _vips(arr: NDArray[np.uint8]) -> Any:
     h, w = arr.shape[:2]
     bands = 1 if arr.ndim == 2 else arr.shape[2]
-    return pyvips.Image.new_from_memory(arr.tobytes(), w, h, bands, "uchar")
+    return vips.Image.new_from_memory(arr.tobytes(), w, h, bands, "uchar")
 
 
 def _np(im: Any) -> NDArray[np.uint8]:
@@ -270,7 +270,7 @@ def test_one_bit_source_stays_one_bit_in_bw(tmp_path: Path) -> None:
     page = Page.model_construct(index=0, width_mm=64.0, height_mm=64.0, dpi=25.4, px=None)
     dst = tmp_path / "o.tif"
     _prepare_raster_page(src, page, make_settings(color={"mode": "bw"}), dst)
-    out = pyvips.Image.new_from_file(str(dst))
+    out = vips.Image.new_from_file(str(dst))
     assert out.bands == 1
     assert out.get("bits-per-sample") == 1
     assert out.xres == pytest.approx(1.0)
@@ -290,7 +290,7 @@ def test_palette_source_is_converted_to_srgb(tmp_path: Path) -> None:
     page = Page.model_construct(index=0, width_mm=16.0, height_mm=16.0, dpi=25.4, px=None)
     dst = tmp_path / "o.tif"
     _prepare_raster_page(src, page, make_settings(color={"mode": "color", "invert": True}), dst)
-    out = _np(pyvips.Image.new_from_file(str(dst)))
+    out = _np(vips.Image.new_from_file(str(dst)))
     assert out.shape[2] == 3
     assert out[0, 0].tolist() == [0, 255, 255]  # red inverted
     assert out[0, 15].tolist() == [255, 255, 0]  # blue inverted

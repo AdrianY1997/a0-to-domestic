@@ -1,5 +1,6 @@
 import type { TFunction } from 'i18next';
 import { ApiError } from '../api/client';
+import { DOCKER_ONLY_CODES, isLocalMode } from './capabilities';
 
 const KNOWN_CODES = new Set([
   'UNSUPPORTED_FORMAT',
@@ -36,6 +37,9 @@ const KNOWN_CODES = new Set([
   'CSRF_INVALID',
   'RENDER_UNAVAILABLE',
   'NETWORK_ERROR',
+  'FORMAT_DOCKER_ONLY',
+  'STORAGE_QUOTA_EXCEEDED',
+  'ENGINE_UNAVAILABLE',
 ]);
 
 /** Translated message for a server error code (params are interpolated), or a generic one. */
@@ -44,6 +48,9 @@ export function errorMessage(
   code: string | null | undefined,
   params: Record<string, unknown> = {},
 ): string {
+  // The web version cannot read these formats: say where they are available.
+  if (code && isLocalMode() && DOCKER_ONLY_CODES.has(code))
+    return t('errors.FORMAT_DOCKER_ONLY', params);
   if (code && KNOWN_CODES.has(code)) return t(`errors.${code}`, params);
   return t('errors.UNKNOWN');
 }

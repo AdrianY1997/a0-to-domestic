@@ -1,0 +1,84 @@
+# Web (local) version on GitHub Pages (SPEC 17bis): the whole app runs in the visitor's browser,
+# Pyodide in a Web Worker, nothing is uploaded. Deployed on every push to main.
+#
+# One-time setup: repository Settings -> Pages -> Build and deployment -> Source: "GitHub Actions".
+name: pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Only the latest deployment matters; never cancel one that is already publishing.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      # Pyodide 0.29.5 core + wheels (PyMuPDF, NumPy, Pillow, pydantic, ...): ~36 MB, served from
+      # the site itself so the app never loads anything from a third-party CDN.
+      - name: Cache the vendored Pyodide files
+        uses: actions/cache@v4
+        with:
+          path: frontend/public/py/pyodide
+          key: pyodide-${{ hashFiles('tools/vendor_pyodide.py', 'tools/build_web_bundle.py') }}
+
+      - name: Vendor Pyodide and its wheels
+        run: python tools/vendor_pyodide.py
+
+      - name: Build a0td.zip and manifest.json
+        run: python tools/build_web_bundle.py
+
+      - name: Install, lint and test the frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run lint
+          npm test
+
+      - name: Build the frontend in local mode
+        working-directory: frontend
+        env:
+          VITE_MODE: local
+          # Project pages live under /<repo>/ (SPEC 17bis).
+          VITE_BASE: /${{ github.event.repository.name }}/
+        run: |
+          npm run build
+          # Unknown paths get the app instead of GitHub's 404 (routing is hash-based anyway).
+          cp dist/index.html dist/404.html
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: frontend/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

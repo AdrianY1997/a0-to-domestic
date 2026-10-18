@@ -8,39 +8,11 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from a0td.domain.errors import DomainError, ErrorCode
+from a0td.domain.errors import HTTP_STATUS_BY_CODE, DomainError, ErrorCode
 
 PROBLEM_JSON = "application/problem+json"
 
-STATUS_BY_CODE: dict[ErrorCode, int] = {
-    ErrorCode.UNSUPPORTED_FORMAT: 415,
-    ErrorCode.FORMAT_NOT_AVAILABLE_IN_IMAGE: 415,
-    ErrorCode.FILE_TOO_LARGE: 413,
-    ErrorCode.TOO_MANY_PAGES: 422,
-    ErrorCode.PIXEL_LIMIT_EXCEEDED: 422,
-    ErrorCode.PAGE_TOO_LARGE: 422,
-    ErrorCode.PASSWORD_REQUIRED: 409,
-    ErrorCode.PASSWORD_INVALID: 422,
-    ErrorCode.PRINT_NOT_ALLOWED: 403,
-    ErrorCode.CORRUPT_FILE: 422,
-    ErrorCode.CONVERSION_FAILED: 422,
-    ErrorCode.CONVERSION_TIMEOUT: 504,
-    ErrorCode.INVALID_SETTINGS: 422,
-    ErrorCode.OVERLAP_TOO_LARGE: 422,
-    ErrorCode.CONTENT_AREA_TOO_SMALL: 422,
-    ErrorCode.SCALE_OUT_OF_RANGE: 422,
-    ErrorCode.TOO_MANY_SHEETS: 422,
-    ErrorCode.DOCUMENT_NOT_READY: 409,
-    ErrorCode.NOT_FOUND: 404,
-    ErrorCode.JOB_CANCELLED: 409,
-    ErrorCode.INTERRUPTED: 500,
-    ErrorCode.PRINTER_UNREACHABLE: 502,
-    ErrorCode.AUTH_REQUIRED: 401,
-    ErrorCode.CALIBRATION_OUT_OF_RANGE: 422,
-    ErrorCode.PRINTER_READONLY: 403,
-    ErrorCode.PRESET_READONLY: 403,
-    ErrorCode.PRINT_REJECTED: 502,
-}
+STATUS_BY_CODE = HTTP_STATUS_BY_CODE
 
 
 def problem_response(

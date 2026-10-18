@@ -1,6 +1,7 @@
 import { lazy } from 'react';
 import { Route, Routes } from 'react-router';
 import { PlaceholderPage } from '../components/PlaceholderPage';
+import { getCapabilities } from '../lib/capabilities';
 import { Layout } from './Layout';
 
 // Route-level code splitting keeps the initial chunk small.
@@ -19,6 +20,7 @@ const LoginPage = lazy(() => import('../features/login/LoginPage'));
 const SettingsPage = lazy(() => import('../features/settings/SettingsPage'));
 
 export function AppRoutes() {
+  const caps = getCapabilities();
   return (
     <Routes>
       <Route element={<Layout />}>
@@ -33,7 +35,7 @@ export function AppRoutes() {
         <Route path="history" element={<HistoryPage />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="help" element={<HelpPage />} />
-        <Route path="login" element={<LoginPage />} />
+        {caps.auth && <Route path="login" element={<LoginPage />} />}
         <Route path="*" element={<PlaceholderPage name="notFound" />} />
       </Route>
     </Routes>

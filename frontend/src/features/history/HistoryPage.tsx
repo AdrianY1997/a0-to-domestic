@@ -15,6 +15,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tansta
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router';
+import { AssetLink } from '../../api/assets';
 import { apiList } from '../../api/client';
 import { createJob, deleteDocument, outputUrl } from '../../api/endpoints';
 import type { DocumentOut, JobOut } from '../../api/types';
@@ -239,14 +240,14 @@ function JobsTab({ q }: { q: string }) {
                             {o.name}
                           </Text>
                         ) : (
-                          <a
+                          <AssetLink
                             key={o.name}
                             href={outputUrl(j.id, o.name)}
                             download={o.name}
                             style={{ fontSize: 12, wordBreak: 'break-all' }}
                           >
                             {t('history.download', { name: o.name })}
-                          </a>
+                          </AssetLink>
                         ),
                       )}
                     </Stack>

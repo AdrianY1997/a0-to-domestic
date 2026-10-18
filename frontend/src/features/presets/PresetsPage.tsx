@@ -13,6 +13,7 @@ import {
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { AssetLink } from '../../api/assets';
 import { usePresets } from '../../api/queries';
 import type { Preset } from '../../api/types';
 import { ErrorAlert } from '../../components/ErrorAlert';
@@ -149,7 +150,7 @@ export default function PresetsPage() {
               <Table.Td>
                 <Group gap="xs">
                   <Button
-                    component="a"
+                    component={AssetLink}
                     href={presetExportUrl(p.id)}
                     download
                     size="xs"

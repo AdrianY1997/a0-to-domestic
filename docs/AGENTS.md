@@ -85,6 +85,10 @@ manual se actualizará.
 | `backend/src/a0td/automation/hotfolder.py` | Carpeta vigilada por sondeo (`A0TD_HOTFOLDER`, `A0TD_HOTFOLDER_INTERVAL_S`); un archivo se procesa cuando tamaño y mtime coinciden en dos sondeos |
 | `.github/workflows/ci.yml` | Lint y tests en la imagen `dev`, auditorías, build multi-arch, Trivy, SBOM, E2E y smoke |
 | `backend/src/a0td/render/{layers,ink}.py`, `ingest/stats.py`, `domain/legibility.py` | Capas OCG en la salida (las ocultas, OFF para View, Print y Export) y tinta estimada (`JobOut.ink`); estadísticas por página (texto mín/p10, línea más fina, `detected_scale`); avisos `SMALL_TEXT`/`THIN_LINES` tras escalar. El espejo va en `ViewTransform.mirror` |
+| `backend/src/a0td/imaging/` | Fachada de imagen: `vips` = pyvips si existe, si no `vips_compat` (Pillow+numpy). `A0TD_IMAGING=pillow` fuerza Pillow. Nunca importes pyvips directamente |
+| `backend/src/a0td/web/bridge.py` | Puente del modo web (SPEC §17bis): `info`, `papers`, `presets`, `printers`, `calibration_pdf`, `ingest`, `get_document`, `cad_info`, `set_physical_size`, `page_preview`, `plan`, `sheet_preview`, `render`, `output_page_thumb`, `delete_*`, `export_document`/`import_document`, `call_json`. Devuelve JSON con formas REST; los errores son `BridgeError` (problem+json). `runtime.is_web()` |
+| `frontend/src/local/`, `frontend/src/api/transport.ts` | Modo local: worker de Pyodide, emulación REST sobre el puente, IndexedDB (documentos como ZIP de `export_document`). Se activa con `VITE_MODE=local`; `VITE_BASE` define la ruta en Pages |
+| `tools/{build_web_bundle,vendor_pyodide}.py`, `scripts/web-smoke.sh` | `a0td.zip` y Pyodide 0.29.5 vendorizado en `frontend/public/py/` (gitignored); smoke en Chromium headless |
 | `backend/tests/` | `unit/`, `property/`, `integration/`, `golden/` (refs en `golden/refs`, regenerar con `pytest --update-golden`), `api/`, `conftest.py`, `render_support.py` (helpers compartidos de render/reensamblado) |
 | `backend/src/a0td/storage/` | Modelos SQLAlchemy (§11.1 + `jobs.options_json`, `jobs.warnings_json`, `*.error_params_json`), Alembic (`backend/alembic.ini`), `files.py` (layout §11.2), `retention.py` |
 | `backend/src/a0td/jobs/` | `manager.py` (subproceso por trabajo, semáforo, SSE, recuperación), `worker.py` (recibe la especificación del trabajo **por stdin**, nunca toca la BD), `exact_scale.py::is_exact_scale(settings, preset_id)` |
@@ -232,6 +236,12 @@ bash scripts/container-smoke.sh                                     # REBUILD=0 
 - Una variable de entorno vacía (`A0TD_X=""`) no es "sin valor": los campos `Path | None` de la config deben
   convertir `""` en `None` (caso real: `A0TD_STATIC_DIR=""` montaba la SPA en `/` y tapaba rutas).
 - Los tests que añaden rutas a una app ya creada fallan si hay SPA montada en `/`: crear la app sin `static_dir`.
+- **Memoria del host limitada (16 GB, WSL2).** Docker Desktop se cayó cuando la VM de WSL llegó a unos 8 GB.
+  - Limita cada contenedor (`docker run --memory 3g`).
+  - No construyas imágenes salvo que cambien las dependencias.
+  - Mientras iteras, ejecuta subconjuntos de tests; la suite completa, una vez al final.
+  - No pongas en marcha dos contenedores pesados a la vez.
+  - Solo deben correr contenedores de este proyecto.
 - **No reinicies Docker Desktop**: hay otros agentes con contenedores en marcha. Si Docker no responde,
   repórtalo al orquestador.
 - Tests de SSE con TestClient: el stream solo vuelve al terminar; ábrelo en un hilo (ver `tests/api/test_hardening.py`).

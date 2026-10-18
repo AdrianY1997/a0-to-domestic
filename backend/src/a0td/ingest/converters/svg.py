@@ -27,6 +27,7 @@ from a0td.ingest.converters.base import ConvertContext, run_tool, tool_available
 from a0td.ingest.converters.common import fresh_dir, pdf_to_canonical, tool_env
 from a0td.ingest.models import CanonicalDocument, DocFormat
 from a0td.ingest.vector_size import NATIVE_SIZE_FILE, rescale_pdf_pages
+from a0td.runtime import is_web
 
 SVG_NS = "http://www.w3.org/2000/svg"
 XLINK_NS = "http://www.w3.org/1999/xlink"
@@ -256,7 +257,8 @@ class SvgConverter:
     handles = frozenset({DocFormat.SVG, DocFormat.SVGZ})
 
     def available(self) -> bool:
-        return tool_available("rsvg-convert") or tool_available("inkscape")
+        # the browser build has no subprocesses: MuPDF opens SVG itself
+        return tool_available("rsvg-convert") or tool_available("inkscape") or is_web()
 
     def convert(self, src: Path, work: Path, ctx: ConvertContext) -> CanonicalDocument:
         fmt = ctx.format or DocFormat.SVG
@@ -268,7 +270,7 @@ class SvgConverter:
         staged.write_bytes(clean)
         pdf = folder / "output.pdf"
         ctx.report("convert", 5, "ingest.convert", tool="rsvg")
-        self._render(staged, pdf, scratch, ctx, env)
+        self._render(staged, pdf, scratch, ctx, env, root)
 
         assumed = not has_physical_size(root)
         if assumed:
@@ -279,9 +281,28 @@ class SvgConverter:
         return canon
 
     @staticmethod
+    def _render_mupdf(staged: Path, pdf: Path, root: ET.Element) -> None:
+        """MuPDF renders the (already sanitized) SVG; it reads ``px`` / unitless as points."""
+        try:
+            with pymupdf.open(staged, filetype="svg") as doc:
+                pdf.write_bytes(doc.convert_to_pdf())
+        except Exception as exc:
+            raise DomainError(ErrorCode.CONVERSION_FAILED, f"cannot render the SVG: {exc}") from exc
+        if _length_mm(root.get("width")) is None or _length_mm(root.get("height")) is None:
+            rescale_pdf_pages(pdf, 72 / 96)  # CSS px (96 per inch), like rsvg-convert
+
+    @staticmethod
     def _render(
-        staged: Path, pdf: Path, scratch: Path, ctx: ConvertContext, env: dict[str, str]
+        staged: Path,
+        pdf: Path,
+        scratch: Path,
+        ctx: ConvertContext,
+        env: dict[str, str],
+        root: ET.Element,
     ) -> None:
+        if is_web() and not (tool_available("rsvg-convert") or tool_available("inkscape")):
+            SvgConverter._render_mupdf(staged, pdf, root)
+            return
         common = {
             "scratch": scratch,
             "timeout_s": ctx.config.job_timeout_s,

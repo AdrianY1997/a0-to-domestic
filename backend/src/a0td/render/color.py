@@ -26,22 +26,23 @@ from typing import Any
 
 import numpy as np
 import pymupdf
-import pyvips
 
 from a0td.config import get_config
 from a0td.domain.errors import DomainError, ErrorCode
 from a0td.domain.settings import ColorMode, ColorSettings, JobSettings
 from a0td.domain.units import MM_PER_INCH
+from a0td.imaging import backend_name, vips
 from a0td.ingest import IngestResult, Page
-from a0td.ingest.converters.base import run_tool
+from a0td.ingest.converters.base import run_tool, tool_available
 from a0td.ingest.models import Layer
 from a0td.render.layers import (
     has_layer_changes,
     layer_states,
     reopen_with_layers,
 )
+from a0td.runtime import is_web
 
-MAX_RASTER_PIXELS = 400_000_000
+MAX_RASTER_PIXELS = 100_000_000 if is_web() else 400_000_000  # wasm32 memory in the browser
 _STATS_PIXELS = 1_000_000
 _BACKGROUND_PERCENTILE = 95.0
 _KNEE = 220  # after the levels, grey values above this become paper white
@@ -64,6 +65,7 @@ class PreparedSources:
     pdf: Path | None = None
     tifs: dict[int, Path] = field(default_factory=dict)
     layers_rasterized: bool = False  # layers forced the vector pages to be rasterized
+    gray_rasterized: bool = False  # no Ghostscript: the grey vector page was rasterized
 
 
 def pixel_ops(color: ColorSettings) -> bool:
@@ -176,7 +178,7 @@ def whiten(im: Any) -> Any:
     im = (grey >= _KNEE).ifthenelse(255, im)
     # despeckle: ink pixels without any ink neighbour are dust
     dark = _luminance(im) < _DARK
-    neighbours = dark.conv(pyvips.Image.new_from_array(_ISOLATION_KERNEL))
+    neighbours = dark.conv(vips.Image.new_from_array(_ISOLATION_KERNEL))
     isolated = dark & (neighbours == 0)
     result: Any = isolated.ifthenelse(255, im)
     return result.cast("uchar")
@@ -265,7 +267,8 @@ def _rasterize_page(
     The resolution drops below ``dpi`` when the page would exceed ``MAX_RASTER_PIXELS``; callers
     must use the returned value. The page is drawn in horizontal bands (``clip=``) that are
     streamed to a raw file, so memory stays bounded; the returned image reads that file
-    (``scratch`` must outlive it). ``hidden`` layers (ANA-07) are switched off and strokes are
+    (``scratch`` must outlive it). Without libvips (no streaming) the bands are written into
+    one in-memory array instead. ``hidden`` layers (ANA-07) are switched off and strokes are
     kept at least ``min_line_mm`` wide (COL-06) while drawing.
     """
     n = 1 if grey else 3
@@ -275,9 +278,11 @@ def _rasterize_page(
         eff = effective_dpi(w_pt, h_pt, dpi)
         z = eff / 72.0
         width, height = math.ceil(w_pt * z - 1e-6), math.ceil(h_pt * z - 1e-6)
+        cs = pymupdf.csGRAY if grey else pymupdf.csRGB
+        if backend_name() != "pyvips":
+            return _rasterize_in_memory(page, z, width, height, n, cs, min_line_mm, eff), eff
         scratch.mkdir(parents=True, exist_ok=True)
         raw = scratch / f"raster-{uuid.uuid4().hex}.raw"
-        cs = pymupdf.csGRAY if grey else pymupdf.csRGB
         with raw.open("wb") as fh, _min_line_width(min_line_mm, eff):
             fh.truncate(width * height * n)
             for y0 in range(0, height, BAND_ROWS):
@@ -296,8 +301,38 @@ def _rasterize_page(
                     fh.seek(r0 * width * n)
                     fh.write(band[r0 - pix.y : r1 - pix.y].tobytes())
                 del pix, arr, band
-    im: Any = pyvips.Image.rawload(str(raw), width, height, n)
+    im: Any = vips.Image.rawload(str(raw), width, height, n)
     return im, eff
+
+
+def _rasterize_in_memory(
+    page: pymupdf.Page,
+    z: float,
+    width: int,
+    height: int,
+    n: int,
+    cs: pymupdf.Colorspace,
+    min_line_mm: float | None,
+    eff: float,
+) -> Any:
+    """Same bands as the streaming path, collected in one array (backends without streaming)."""
+    out = np.full((height, width, n), 255, np.uint8)
+    with _min_line_width(min_line_mm, eff):
+        for y0 in range(0, height, BAND_ROWS):
+            y1 = min(height, y0 + BAND_ROWS)
+            clip = pymupdf.Rect(0, y0 / z, page.rect.width, min(page.rect.height, y1 / z))
+            pix = page.get_pixmap(
+                matrix=pymupdf.Matrix(z, z), clip=clip, colorspace=cs, alpha=False
+            )
+            arr = np.frombuffer(pix.samples, np.uint8).reshape(pix.height, pix.width, n)
+            x_from, x_to = max(0, pix.x), min(width, pix.x + pix.width)
+            r0, r1 = max(0, pix.y), min(height, pix.y + pix.height)
+            if x_to > x_from and r1 > r0:
+                out[r0:r1, x_from:x_to] = arr[
+                    r0 - pix.y : r1 - pix.y, x_from - pix.x : x_to - pix.x
+                ]
+            del pix, arr
+    return vips.Image.new_from_memory(out, width, height, n, "uchar")
 
 
 def _to_srgb8(im: Any) -> Any:
@@ -336,7 +371,7 @@ def _page_ppm(page: Page) -> float:
 
 def _prepare_raster_page(src: Path, page: Page, settings: JobSettings, dst: Path) -> None:
     ppm = _page_ppm(page)
-    im: Any = pyvips.Image.new_from_file(str(src), access="sequential")
+    im: Any = vips.Image.new_from_file(str(src), access="sequential")
     bps = im.get("bits-per-sample") if im.get_typeof("bits-per-sample") else 8
     one_bit = im.bands == 1 and bps == 1
     im = _to_srgb8(im)
@@ -378,14 +413,22 @@ def prepare_sources(
     if ingest.kind == "pdf":
         assert ingest.canonical_pdf is not None
         canonical = doc_dir / ingest.canonical_pdf
-        forced = layers_force_raster(ingest, selected, settings)
+        layers_forced = layers_force_raster(ingest, selected, settings)
+        # No Ghostscript (browser build): a grey vector page is drawn as a grey raster instead.
+        no_gs = color.mode is ColorMode.GRAYSCALE and not tool_available("gs")
+        forced = layers_forced or no_gs
         if not needs_raster_pdf(settings) and not forced:
             if color.mode is ColorMode.GRAYSCALE:
                 prepared.pdf = _cached_grey(canonical, doc_dir, work)
             return prepared
-        prepared.layers_rasterized = forced and not needs_raster_pdf(settings)
+        prepared.layers_rasterized = layers_forced and not needs_raster_pdf(settings)
+        prepared.gray_rasterized = no_gs and not layers_forced and not needs_raster_pdf(settings)
         source = canonical
-        if color.mode is ColorMode.GRAYSCALE and not _layers_active(ingest, selected, settings):
+        if (
+            color.mode is ColorMode.GRAYSCALE
+            and not no_gs
+            and not _layers_active(ingest, selected, settings)
+        ):
             source = _cached_grey(canonical, doc_dir, work)
         grey = color.mode is not ColorMode.COLOR
         for idx in selected:

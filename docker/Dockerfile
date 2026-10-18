@@ -134,10 +134,11 @@ RUN ln -s ../lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
  && rm -rf /var/lib/apt/lists/*
 # Dev group (pytest, ruff, mypy...) and an editable install; ./backend is bind-mounted over
 # /app/backend at runtime, the venv lives outside the mount in /opt/venv.
+# The slim layer strips *.pyi; numpy is reinstalled so mypy sees its type stubs.
 ENV UV_COMPILE_BYTECODE=0
 COPY --from=uv /uv /usr/local/bin/uv
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --group dev \
+    uv sync --frozen --group dev --reinstall-package numpy \
  && chown -R app:app /opt/venv
 USER 10001:10001
 CMD ["uvicorn", "a0td.api.app:create_app", "--factory", "--reload", "--host", "0.0.0.0", "--port", "8000"]

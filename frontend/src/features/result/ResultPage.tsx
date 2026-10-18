@@ -3,7 +3,6 @@ import {
   Button,
   Card,
   Group,
-  Image,
   Progress,
   SimpleGrid,
   Stack,
@@ -15,6 +14,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router';
+import { AssetImage, AssetLink, openAsset } from '../../api/assets';
 import { cancelJob, createJob, jobEventsUrl, outputThumbUrl, outputUrl } from '../../api/endpoints';
 import { useJob } from '../../api/queries';
 import { useEventStream } from '../../api/sse';
@@ -125,7 +125,7 @@ function Outputs({ job }: { job: JobOut }) {
 
   const printPdf = (out: OutputFile) => {
     // IMP-01: open the PDF in the browser's viewer and show how to print it.
-    window.open(outputUrl(job.id, out.name, true), '_blank', 'noopener');
+    openAsset(outputUrl(job.id, out.name, true));
     open();
   };
 
@@ -214,7 +214,7 @@ function OutputCard({ job, out, onPrint }: { job: JobOut; out: OutputFile; onPri
           </div>
           <Group gap="xs">
             <Button
-              component="a"
+              component={AssetLink}
               href={outputUrl(job.id, out.name)}
               download={out.name}
               data-testid="download"
@@ -231,7 +231,7 @@ function OutputCard({ job, out, onPrint }: { job: JobOut; out: OutputFile; onPri
         {isPdf && thumbs > 0 && (
           <SimpleGrid cols={{ base: 3, sm: 4, md: 6 }} spacing="xs">
             {Array.from({ length: thumbs }, (_, n) => (
-              <Image
+              <AssetImage
                 key={n}
                 src={outputThumbUrl(job.id, out.name, n)}
                 alt={t('result.pageThumb', { n: n + 1 })}

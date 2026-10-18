@@ -13,6 +13,7 @@ from a0td.ingest.canonical import canonicalize_raster
 from a0td.ingest.converters.base import ConvertContext
 from a0td.ingest.converters.common import fresh_dir
 from a0td.ingest.models import CanonicalDocument, DocFormat
+from a0td.runtime import is_web
 
 _EXIF_XRES, _EXIF_YRES, _EXIF_UNIT = 282, 283, 296
 
@@ -37,9 +38,33 @@ def _exif_dpi(img: Image.Image) -> tuple[float, float] | None:
     return (x * 2.54, y * 2.54) if unit == 3 else (x, y)
 
 
+def _web_handles() -> frozenset[DocFormat]:
+    """Formats the browser build can decode: its Pillow has no OpenJPEG and its libheif no AV1."""
+    from PIL import features
+
+    handles = {DocFormat.HEIF}
+    av1 = features.check("avif")
+    try:
+        import pillow_heif
+
+        decoders = pillow_heif.libheif_info().get("decoders", {})
+        av1 = av1 or any(name in decoders for name in ("dav1d", "aom", "libgav1", "svt"))
+    except (ImportError, OSError, AttributeError):
+        pass
+    if av1:
+        handles.add(DocFormat.AVIF)
+    if features.check("jpg_2000"):
+        handles.add(DocFormat.JP2)
+    return frozenset(handles)
+
+
 class HeifConverter:
     id = "heif"
-    handles = frozenset({DocFormat.HEIF, DocFormat.AVIF, DocFormat.JP2})
+    _ALL = frozenset({DocFormat.HEIF, DocFormat.AVIF, DocFormat.JP2})
+
+    @property
+    def handles(self) -> frozenset[DocFormat]:  # type: ignore[override]
+        return _web_handles() if is_web() else self._ALL
 
     def available(self) -> bool:
         try:

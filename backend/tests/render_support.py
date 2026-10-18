@@ -6,13 +6,13 @@ from typing import Any
 
 import numpy as np
 import pymupdf
-import pyvips
 from numpy.typing import NDArray
 
 from a0td.domain.geometry import Rect
 from a0td.domain.plan import Plan
 from a0td.domain.settings import JobSettings, merge_settings
 from a0td.domain.units import MM_PER_PT
+from a0td.imaging import vips
 
 Gray = NDArray[np.uint8]
 FIXED_NOW = datetime(2026, 1, 15, 12, 0, 0, tzinfo=UTC)
@@ -94,7 +94,7 @@ def direct_vector(pdf: Path, pno: int, plan: Plan, dpi: float, rotate: int = 0) 
 def direct_raster(tif: Path, plan: Plan, width_mm: float, height_mm: float, dpi: float) -> Gray:
     """Direct resample of a canonical raster page to the plan's scale."""
     ppm = dpi / 25.4
-    im = pyvips.Image.new_from_file(str(tif))
+    im = vips.Image.new_from_file(str(tif))
     if im.bands > 1:
         im = im.colourspace("b-w")
     fx = ppm * plan.scale * width_mm / im.width

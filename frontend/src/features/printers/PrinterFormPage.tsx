@@ -19,6 +19,7 @@ import { usePapers, usePrinters, useInfo } from '../../api/queries';
 import { ippCapabilities } from '../../api/endpoints';
 import type { IppCapabilities, Margins, PrinterProfile } from '../../api/types';
 import { ErrorAlert } from '../../components/ErrorAlert';
+import { getCapabilities } from '../../lib/capabilities';
 import { createPrinter, updatePrinter, type PrinterInput } from './api';
 import { prefillFromCapabilities } from './ipp';
 import { MarginsFields } from './MarginsFields';
@@ -185,7 +186,7 @@ function PrinterForm({
         onChange={(v) => patch({ supported: v.length === allIds.length ? null : v })}
       />
 
-      {info.data?.ipp_enabled && (
+      {getCapabilities().ipp && info.data?.ipp_enabled && (
         <Stack gap="xs">
           <Group align="flex-end" wrap="nowrap">
             <TextInput

@@ -20,6 +20,7 @@ from PIL import Image
 from a0td.domain.geometry import Rect
 from a0td.domain.settings import BlankSensitivity
 from a0td.domain.units import EPS
+from a0td.imaging import vips
 from a0td.ingest.models import Page, PageKind
 
 PX_PER_MM = 2.0
@@ -119,9 +120,7 @@ def render_pdf_gray(pdf_path: Path, index: int, rows: int, cols: int) -> np.ndar
 
 def render_raster_gray(tif_path: Path, rows: int, cols: int) -> np.ndarray:
     """Gray, area-averaged version of a canonical raster page at ``rows x cols``."""
-    import pyvips
-
-    im = pyvips.Image.new_from_file(str(tif_path), access="sequential")
+    im = vips.Image.new_from_file(str(tif_path), access="sequential")
     if im.bands > 1:
         im = im.colourspace("b-w")
     im = im.resize(cols / im.width, vscale=rows / im.height, kernel="linear")

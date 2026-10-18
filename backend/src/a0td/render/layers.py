@@ -10,6 +10,7 @@ the same configuration, which keeps the editor preview consistent with the file.
 
 import re
 from pathlib import Path
+from typing import Any
 
 import pymupdf
 
@@ -233,6 +234,29 @@ def reopen_with_layers(doc: pymupdf.Document, off: list[int]) -> pymupdf.Documen
     return pymupdf.open("pdf", data)
 
 
+def _layered_preview_image(
+    canonical: Path,
+    index: int,
+    layers: list[Layer],
+    hidden: list[str],
+    visible: list[str] | None,
+    max_px: int,
+) -> Any:
+    from PIL import Image
+
+    doc = pymupdf.open(canonical)
+    try:
+        doc = reopen_with_layers(doc, layer_states(doc, layers, hidden, visible))
+        page = doc[index]
+        zoom = max(1, max_px) / max(page.rect.width, page.rect.height)
+        pix = page.get_pixmap(
+            matrix=pymupdf.Matrix(zoom, zoom), colorspace=pymupdf.csRGB, alpha=False
+        )
+        return Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
+    finally:
+        doc.close()
+
+
 def layered_preview_webp(
     canonical: Path,
     index: int,
@@ -244,19 +268,24 @@ def layered_preview_webp(
     """WEBP of canonical page ``index`` with the effective layer state (editor preview, ANA-07)."""
     import io
 
-    from PIL import Image
-
-    doc = pymupdf.open(canonical)
-    try:
-        doc = reopen_with_layers(doc, layer_states(doc, layers, hidden, visible))
-        page = doc[index]
-        zoom = max(1, max_px) / max(page.rect.width, page.rect.height)
-        pix = page.get_pixmap(
-            matrix=pymupdf.Matrix(zoom, zoom), colorspace=pymupdf.csRGB, alpha=False
-        )
-        img = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
-    finally:
-        doc.close()
+    img = _layered_preview_image(canonical, index, layers, hidden, visible, max_px)
     buf = io.BytesIO()
     img.save(buf, format="WEBP", quality=85)
+    return buf.getvalue()
+
+
+def layered_preview_png(
+    canonical: Path,
+    index: int,
+    layers: list[Layer],
+    hidden: list[str],
+    visible: list[str] | None,
+    max_px: int,
+) -> bytes:
+    """Same as :func:`layered_preview_webp`, as PNG (web local mode)."""
+    import io
+
+    img = _layered_preview_image(canonical, index, layers, hidden, visible, max_px)
+    buf = io.BytesIO()
+    img.save(buf, format="PNG", compress_level=3)
     return buf.getvalue()

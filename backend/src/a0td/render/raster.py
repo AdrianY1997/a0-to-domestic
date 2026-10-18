@@ -16,11 +16,11 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import pymupdf
-import pyvips
 
 from a0td.domain.geometry import Rect
 from a0td.domain.page import ViewTransform
 from a0td.domain.units import EPS, MM_PER_INCH, mm_to_pt
+from a0td.imaging import vips
 from a0td.render.geometry import ViewMap
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -37,7 +37,7 @@ class RasterSource:
     def __init__(
         self, path: Path, width_mm: float, height_mm: float, *, sequential: bool = False
     ) -> None:
-        im: Any = pyvips.Image.new_from_file(
+        im: Any = vips.Image.new_from_file(
             str(path), access="sequential" if sequential else "random"
         )
         if im.hasalpha():
@@ -139,7 +139,7 @@ def embed_tile(
             doc, w, h, "DeviceRGB", 8, _up_filtered(arr.reshape(h, w * 3)), "FlateDecode",
             _flate_parms(3, 8, w),
         )  # fmt: skip
-    im: Any = pyvips.Image.new_from_memory(arr.tobytes(), w, h, 3, "uchar")
+    im: Any = vips.Image.new_from_memory(arr.tobytes(), w, h, 3, "uchar")
     jpg: bytes = im.write_to_buffer(".jpg", Q=jpeg_quality, strip=True, optimize_coding=True)
     return _add_image(doc, w, h, "DeviceRGB", 8, jpg, "DCTDecode")
 

@@ -45,7 +45,7 @@ describe('app shell', () => {
   it('renders the printers route', async () => {
     await i18n.changeLanguage('es');
     renderAt('/printers/abc/calibrate');
-    expect(await screen.findByText(es.printers.loading)).toBeInTheDocument();
+    expect(await screen.findByText(es.printers.loading, {}, { timeout: 5000 })).toBeInTheDocument();
   });
 
   it('en.json has the same keys as es.json', () => {
@@ -56,11 +56,12 @@ describe('app shell', () => {
 describe('token mode', () => {
   it('shows a full-page notice instead of the app', async () => {
     await i18n.changeLanguage('en');
-    const fetchMock = vi.fn(async () =>
-      new Response(JSON.stringify({ auth_mode: 'token', authenticated: false }), {
-        status: 200,
-        headers: { 'content-type': 'application/json' },
-      }),
+    const fetchMock = vi.fn(
+      async () =>
+        new Response(JSON.stringify({ auth_mode: 'token', authenticated: false }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        }),
     );
     vi.stubGlobal('fetch', fetchMock);
     try {

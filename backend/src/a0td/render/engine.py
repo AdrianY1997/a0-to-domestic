@@ -518,6 +518,12 @@ def render_job(
             )
             if prepared.layers_rasterized:
                 warnings.append(RenderWarning(code="LAYERS_RASTERIZED", severity="info"))
+            if prepared.gray_rasterized:
+                warnings.append(
+                    RenderWarning(
+                        code="LOCAL_LIMIT", severity="info", params={"limit": "gray_vector"}
+                    )
+                )
         template = settings.output.filename_template
         pdf_name = build_filename(template, name=doc_name, plan=plans[0], suffix=test_suffix)
         drawn = _draw_pdf(

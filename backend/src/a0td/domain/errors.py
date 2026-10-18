@@ -34,6 +34,38 @@ class ErrorCode(StrEnum):
     PRINT_REJECTED = "PRINT_REJECTED"  # the printer answered but refused or aborted the job
 
 
+# HTTP status of each code in the REST API; the web bridge reports it too (SPEC 10, 17bis).
+HTTP_STATUS_BY_CODE: dict[ErrorCode, int] = {
+    ErrorCode.UNSUPPORTED_FORMAT: 415,
+    ErrorCode.FORMAT_NOT_AVAILABLE_IN_IMAGE: 415,
+    ErrorCode.FILE_TOO_LARGE: 413,
+    ErrorCode.TOO_MANY_PAGES: 422,
+    ErrorCode.PIXEL_LIMIT_EXCEEDED: 422,
+    ErrorCode.PAGE_TOO_LARGE: 422,
+    ErrorCode.PASSWORD_REQUIRED: 409,
+    ErrorCode.PASSWORD_INVALID: 422,
+    ErrorCode.PRINT_NOT_ALLOWED: 403,
+    ErrorCode.CORRUPT_FILE: 422,
+    ErrorCode.CONVERSION_FAILED: 422,
+    ErrorCode.CONVERSION_TIMEOUT: 504,
+    ErrorCode.INVALID_SETTINGS: 422,
+    ErrorCode.OVERLAP_TOO_LARGE: 422,
+    ErrorCode.CONTENT_AREA_TOO_SMALL: 422,
+    ErrorCode.SCALE_OUT_OF_RANGE: 422,
+    ErrorCode.TOO_MANY_SHEETS: 422,
+    ErrorCode.DOCUMENT_NOT_READY: 409,
+    ErrorCode.NOT_FOUND: 404,
+    ErrorCode.JOB_CANCELLED: 409,
+    ErrorCode.INTERRUPTED: 500,
+    ErrorCode.PRINTER_UNREACHABLE: 502,
+    ErrorCode.AUTH_REQUIRED: 401,
+    ErrorCode.CALIBRATION_OUT_OF_RANGE: 422,
+    ErrorCode.PRINTER_READONLY: 403,
+    ErrorCode.PRESET_READONLY: 403,
+    ErrorCode.PRINT_REJECTED: 502,
+}
+
+
 class WarningCode(StrEnum):
     LOW_DPI = "LOW_DPI"
     VERY_LOW_DPI = "VERY_LOW_DPI"
@@ -50,6 +82,8 @@ class WarningCode(StrEnum):
     PDF_REPAIRED = "PDF_REPAIRED"
     LOW_FIDELITY_FORMAT = "LOW_FIDELITY_FORMAT"
     BOX_FALLBACK = "BOX_FALLBACK"  # requested page box is missing; the crop box is used
+    ICC_IGNORED = "ICC_IGNORED"  # no colour engine here: embedded ICC / CMYK profile approximated
+    LOCAL_LIMIT = "LOCAL_LIMIT"  # web local mode: a setting was lowered to the browser's limits
 
 
 class Severity(StrEnum):

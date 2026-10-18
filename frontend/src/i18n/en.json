@@ -82,6 +82,9 @@
     "INTERNAL_ERROR": "Internal server error. Retry; if it persists, check the server logs.",
     "UNKNOWN": "An unexpected error occurred. Please try again.",
     "NETWORK_ERROR": "Could not reach the server. Check your connection and try again.",
+    "FORMAT_DOCKER_ONLY": "This format is available in the Docker version only. Convert the file to PDF or use that version.",
+    "STORAGE_QUOTA_EXCEEDED": "The browser storage is full. Delete documents in History or Settings and try again.",
+    "ENGINE_UNAVAILABLE": "The in-browser engine is not available. Reload the page.",
     "UNSUPPORTED_FORMAT": "Unsupported format. Try one of the formats in the list.",
     "FORMAT_NOT_AVAILABLE_IN_IMAGE": "This format is not available in this application image. Convert the file to PDF or use the full image.",
     "FILE_TOO_LARGE": "The file exceeds the {{max_mb}} MB limit. Reduce its size or split it.",
@@ -309,6 +312,10 @@
       "title": "Very thin lines",
       "message": "At this scale some lines will be thinner than 0.1 mm and may not print."
     },
+    "LOCAL_LIMIT": {
+      "title": "Web version limit",
+      "message": "The web version limits resolution and size to fit the browser memory; the result may have lower quality. The Docker version has no such limit."
+    },
     "MANY_SHEETS": {
       "title": "Many sheets",
       "message": "More than 50 sheets are needed. Check the scale and the paper."
@@ -328,6 +335,10 @@
     "LAYERS_RASTERIZED": {
       "title": "Layers rasterized",
       "message": "Layers changed state, so the output was rendered as images to make sure hidden content is not printed."
+    },
+    "ICC_IGNORED": {
+      "title": "Colour profile approximated",
+      "message": "The embedded ICC/CMYK colour profile could not be applied, so colours are approximated. Check a test print before printing the whole document."
     },
     "DARK_BACKGROUND": {
       "title": "Dark background",
@@ -805,6 +816,32 @@
       "builtinBlocked": "Built-in profiles cannot be calibrated. Duplicate it first.",
       "notFound": "Profile not found."
     }
+  },
+  "boot": {
+    "title": "Starting the in-browser engine…",
+    "hint": "This happens once; next visits start from the cache and work offline. You can already choose a file.",
+    "stage": {
+      "runtime": "Downloading the Python runtime…",
+      "packages": "Loading libraries (PyMuPDF, NumPy, Pillow)…",
+      "extras": "Loading extra format support…",
+      "bundle": "Unpacking the application…",
+      "engine": "Starting the engine…",
+      "ready": "Ready"
+    },
+    "failed": {
+      "title": "The in-browser engine could not start",
+      "text": "Reload the page. If it keeps failing, your browser may not support WebAssembly workers, or the download was interrupted.",
+      "retry": "Reload"
+    }
+  },
+  "local": {
+    "banner": "Everything is processed in your browser; your files never leave your computer.",
+    "dockerLink": "See the Docker version",
+    "dockerOnly": {
+      "title": "Available in the Docker version",
+      "text": "These formats need tools that do not run in the browser. Run the Docker version to open them, or export them to PDF first."
+    },
+    "storageFull": "The browser storage is full. Delete documents in History or Settings and try again."
   },
   "tokenMode": {
     "title": "Browser access is disabled",

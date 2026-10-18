@@ -17,6 +17,7 @@ import { printJob } from '../../api/endpoints';
 import { useInfo, useJob, usePrinters } from '../../api/queries';
 import type { JobOut, PrintingInfo } from '../../api/types';
 import { ErrorAlert } from '../../components/ErrorAlert';
+import { getCapabilities } from '../../lib/capabilities';
 import { errorMessage } from '../../lib/errors';
 import { parseSheetSelection, type SheetRef } from '../../lib/tiling';
 
@@ -60,7 +61,7 @@ export function PrintToPrinter({ job }: { job: JobOut }) {
     onSuccess: (created) => setSentId(created.id),
   });
 
-  if (!info.data?.ipp_enabled || ippPrinters.length === 0) return null;
+  if (!getCapabilities().ipp || !info.data?.ipp_enabled || ippPrinters.length === 0) return null;
   if (!job.outputs.some((o) => o.kind === 'pdf')) return null;
 
   const preferred = job.settings?.target?.printer_id;

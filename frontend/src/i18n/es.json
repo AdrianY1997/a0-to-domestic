@@ -82,6 +82,9 @@
     "INTERNAL_ERROR": "Error interno del servidor. Reintenta; si persiste, revisa los registros del servidor.",
     "UNKNOWN": "Ha ocurrido un error inesperado. Inténtalo de nuevo.",
     "NETWORK_ERROR": "No se pudo conectar con el servidor. Comprueba la conexión e inténtalo de nuevo.",
+    "FORMAT_DOCKER_ONLY": "Este formato solo está disponible en la versión Docker. Convierte el archivo a PDF o usa esa versión.",
+    "STORAGE_QUOTA_EXCEEDED": "El almacenamiento del navegador está lleno. Borra documentos en Historial o Ajustes e inténtalo de nuevo.",
+    "ENGINE_UNAVAILABLE": "El motor del navegador no está disponible. Recarga la página.",
     "UNSUPPORTED_FORMAT": "Formato no soportado. Prueba con uno de los formatos de la lista.",
     "FORMAT_NOT_AVAILABLE_IN_IMAGE": "Este formato no está disponible en esta imagen de la aplicación. Convierte el archivo a PDF o usa la imagen completa.",
     "FILE_TOO_LARGE": "El archivo supera el límite de {{max_mb}} MB. Reduce su tamaño o divídelo.",
@@ -309,6 +312,10 @@
       "title": "Líneas muy finas",
       "message": "Con esta escala algunas líneas quedarán más finas que 0,1 mm y pueden no imprimirse."
     },
+    "LOCAL_LIMIT": {
+      "title": "Límite de la versión web",
+      "message": "La versión web limita la resolución y el tamaño para caber en la memoria del navegador; el resultado puede tener menos calidad. La versión Docker no tiene ese límite."
+    },
     "MANY_SHEETS": {
       "title": "Muchas hojas",
       "message": "Se necesitan más de 50 hojas. Comprueba la escala y el papel."
@@ -328,6 +335,10 @@
     "LAYERS_RASTERIZED": {
       "title": "Capas rasterizadas",
       "message": "Cambiaste el estado de capas, así que la salida se generó como imágenes para asegurar que el contenido oculto no se imprime."
+    },
+    "ICC_IGNORED": {
+      "title": "Perfil de color aproximado",
+      "message": "El perfil de color ICC/CMYK incrustado no se pudo aplicar, así que los colores son aproximados. Haz una impresión de prueba antes de imprimir todo el documento."
     },
     "DARK_BACKGROUND": {
       "title": "Fondo oscuro",
@@ -805,6 +816,32 @@
       "builtinBlocked": "Los perfiles integrados no se pueden calibrar. Duplícalo primero.",
       "notFound": "Perfil no encontrado."
     }
+  },
+  "boot": {
+    "title": "Iniciando el motor en tu navegador…",
+    "hint": "Solo ocurre una vez; las siguientes visitas arrancan desde la caché y funcionan sin conexión. Ya puedes elegir un archivo.",
+    "stage": {
+      "runtime": "Descargando el entorno de Python…",
+      "packages": "Cargando bibliotecas (PyMuPDF, NumPy, Pillow)…",
+      "extras": "Cargando soporte de formatos adicionales…",
+      "bundle": "Descomprimiendo la aplicación…",
+      "engine": "Iniciando el motor…",
+      "ready": "Listo"
+    },
+    "failed": {
+      "title": "No se pudo iniciar el motor en el navegador",
+      "text": "Recarga la página. Si sigue fallando, es posible que tu navegador no admita workers con WebAssembly o que la descarga se haya interrumpido.",
+      "retry": "Recargar"
+    }
+  },
+  "local": {
+    "banner": "Todo se procesa en tu navegador; tus archivos no salen de tu equipo.",
+    "dockerLink": "Ver la versión Docker",
+    "dockerOnly": {
+      "title": "Disponible en la versión Docker",
+      "text": "Estos formatos necesitan herramientas que no se ejecutan en el navegador. Usa la versión Docker para abrirlos o expórtalos antes a PDF."
+    },
+    "storageFull": "El almacenamiento del navegador está lleno. Borra documentos en Historial o Ajustes e inténtalo de nuevo."
   },
   "tokenMode": {
     "title": "El acceso desde el navegador está desactivado",

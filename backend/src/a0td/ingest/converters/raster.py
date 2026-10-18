@@ -1,4 +1,4 @@
-"""Common raster converter (png, jpeg, tiff, gif, bmp, webp) through libvips."""
+"""Common raster converter (png, jpeg, tiff, gif, bmp, webp): libvips, or Pillow + numpy."""
 
 from pathlib import Path
 
@@ -21,11 +21,7 @@ class RasterConverter:
     )
 
     def available(self) -> bool:
-        try:
-            import pyvips  # noqa: F401
-        except (ImportError, OSError):  # missing libvips shared library
-            return False
-        return True
+        return True  # pyvips, or the Pillow + numpy backend when libvips is missing
 
     def convert(self, src: Path, work: Path, ctx: ConvertContext) -> CanonicalDocument:
         from a0td.ingest.detect import detect_format

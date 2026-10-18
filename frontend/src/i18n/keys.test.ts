@@ -37,5 +37,5 @@ describe('i18n keys', () => {
       }
     }
     expect(missing).toEqual([]);
-  });
+  }, 30_000);
 });

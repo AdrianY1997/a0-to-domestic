@@ -12,18 +12,19 @@ from pathlib import Path
 from typing import Any
 
 import pymupdf
-import pyvips
 
 from a0td.domain.errors import DomainError, ErrorCode
 from a0td.domain.plan import Plan
 from a0td.domain.planner import printer_correction_matrix
 from a0td.domain.settings import JobSettings
+from a0td.imaging import vips
 from a0td.render.color import effective_dpi
+from a0td.runtime import is_web
 from a0td.version import __version__
 
 JOB_ATTACHMENT = "a0td-job.json"
 NAME_MAX = 60
-MAX_ZIP_PIXELS = 150_000_000  # per page image in the ZIP outputs
+MAX_ZIP_PIXELS = 50_000_000 if is_web() else 150_000_000  # per page image in the ZIP outputs
 _VIEWER_PREFS = "<</PrintScaling/None/Duplex/Simplex/PickTrayByPDFSize true>>"
 _TEMPLATE_KEYS = ("name", "paper", "orientation", "cols", "rows", "scale")
 
@@ -121,7 +122,7 @@ IMAGE_EXT = {"png_zip": "png", "jpeg_zip": "jpg", "tiff_zip": "tif"}
 
 def encode_pixmap(pix: pymupdf.Pixmap, fmt: str, jpeg_quality: int, dpi: float) -> bytes:
     """PNG / JPEG / TIFF bytes of a pixmap, carrying the resolution (``pix`` stays alive)."""
-    im: Any = pyvips.Image.new_from_memory(pix.samples_mv, pix.width, pix.height, pix.n, "uchar")
+    im: Any = vips.Image.new_from_memory(pix.samples_mv, pix.width, pix.height, pix.n, "uchar")
     ppm = dpi / 25.4
     im = im.copy(xres=ppm, yres=ppm)
     if fmt == "png":

@@ -5,8 +5,10 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
 import { createJob, documentEventsUrl, previewUrl } from '../../api/endpoints';
 import { useCadInfo, useDocument, useInfo, usePlan, usePresets } from '../../api/queries';
+import { useAssetUrl } from '../../api/assets';
 import { useEventStream } from '../../api/sse';
 import type { DocumentOut } from '../../api/types';
+import { DockerLink, isDockerOnlyError } from '../../components/DockerHint';
 import { ErrorAlert } from '../../components/ErrorAlert';
 import { errorMessage } from '../../lib/errors';
 import { progressMessage } from '../../lib/progress';
@@ -114,6 +116,12 @@ function FailedView({ doc }: { doc: DocumentOut }) {
       </Title>
       <Alert color="red" title={t('document.failed')} role="alert">
         {errorMessage(t, doc.error_code, doc.error_params)}
+        {isDockerOnlyError(doc.error_code) && (
+          <>
+            {' '}
+            <DockerLink />
+          </>
+        )}
         {doc.error_code === 'UNSUPPORTED_FORMAT' && formats && (
           <Text size="sm" mt="xs">
             {t('document.supportedFormats', { formats })}
@@ -211,7 +219,7 @@ function ReadyEditor({ doc }: { doc: DocumentOut }) {
   const hiddenKey = editor.settings.hiddenLayers.join(',');
   const visibleKey = editor.settings.visibleLayers.join(',');
 
-  const image: PageImage | undefined = useMemo(() => {
+  const pageImage: PageImage | undefined = useMemo(() => {
     if (!page) return undefined;
     const maxPx = Math.min(2400, info.data?.limits.preview_max_px ?? 2400);
     const box = page.boxes_mm[drawnBox] ?? page.boxes_mm.crop;
@@ -232,6 +240,12 @@ function ReadyEditor({ doc }: { doc: DocumentOut }) {
       mirror: drawnMirror,
     };
   }, [page, doc.id, info.data, drawnBox, drawnRotate, drawnMirror, hiddenKey, visibleKey]);
+  // Local mode renders the page in the worker: the URL becomes a blob URL once it is ready.
+  const imageUrl = useAssetUrl(pageImage?.url, true);
+  const image = useMemo(
+    () => (pageImage && imageUrl ? { ...pageImage, url: imageUrl } : undefined),
+    [pageImage, imageUrl],
+  );
 
   if (!page) {
     return <Alert color="red">{t('errors.UNKNOWN')}</Alert>;

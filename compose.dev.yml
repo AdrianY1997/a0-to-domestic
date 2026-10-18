@@ -11,6 +11,7 @@ services:
     volumes:
       - ./backend:/app/backend          # code mounted; the venv lives in /opt/venv (outside the mount)
       - ./fixtures:/app/fixtures:ro     # test fixtures (tests resolve them at <repo>/fixtures)
+      - ./tools:/app/tools:ro           # tests/test_web_bundle needs the bundle tooling
       - a0dev-data:/data
     environment:
       A0TD_LOG_FORMAT: text

@@ -1,11 +1,11 @@
 import {
   ActionIcon,
+  Alert,
   Anchor,
   Badge,
   Button,
   Card,
   Group,
-  Image,
   Loader,
   Progress,
   SimpleGrid,
@@ -19,8 +19,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router';
+import { AssetImage } from '../../api/assets';
 import { deleteDocument, thumbUrl } from '../../api/endpoints';
 import { useInfo, usePresets, useRecentDocuments } from '../../api/queries';
+import { DockerLink, isDockerOnlyError } from '../../components/DockerHint';
+import { DOCKER_ONLY_EXTENSIONS, getCapabilities } from '../../lib/capabilities';
 import { errorMessage } from '../../lib/errors';
 import { useFormat } from '../../lib/useFormat';
 import { useAppStore } from '../../store/app';
@@ -35,6 +38,7 @@ export function HomePage() {
   const info = useInfo();
   const presets = usePresets();
   const recent = useRecentDocuments();
+  const caps = getCapabilities();
   const quickPresetId = useAppStore((s) => s.quickPresetId);
   const setQuickPresetId = useAppStore((s) => s.setQuickPresetId);
 
@@ -77,6 +81,12 @@ export function HomePage() {
         <Title order={1}>{t('home.title')}</Title>
         <Text c="dimmed">{t('home.subtitle')}</Text>
       </Stack>
+
+      {caps.clientOnly && (
+        <Alert color="teal" variant="light" role="note" data-testid="local-banner">
+          {t('local.banner')}
+        </Alert>
+      )}
 
       <Dropzone
         onDrop={upload}
@@ -163,6 +173,23 @@ export function HomePage() {
         <Text size="xs" c="dimmed">
           {t('home.formats.more')}
         </Text>
+        {caps.clientOnly && (
+          <Stack gap={6} data-testid="docker-only-formats">
+            <Text size="sm" fw={500}>
+              {t('local.dockerOnly.title')}
+            </Text>
+            <Group gap={6}>
+              {DOCKER_ONLY_EXTENSIONS.map((f) => (
+                <Badge key={f} variant="outline" color="gray">
+                  {f.toUpperCase()}
+                </Badge>
+              ))}
+            </Group>
+            <Text size="xs" c="dimmed">
+              {t('local.dockerOnly.text')} <DockerLink />
+            </Text>
+          </Stack>
+        )}
       </Stack>
 
       <RecentDocuments docs={recent.data} loading={recent.isLoading} />
@@ -190,6 +217,12 @@ function UploadRow({ item }: { item: UploadItem }) {
           {item.status === 'error' && (
             <Text size="xs" c="red" role="alert">
               {errorMessage(t, item.errorCode, item.errorParams)}
+              {isDockerOnlyError(item.errorCode) && (
+                <>
+                  {' '}
+                  <DockerLink />
+                </>
+              )}
             </Text>
           )}
           {item.status === 'done' && (
@@ -237,7 +270,7 @@ function RecentDocuments({
           <Card key={d.id} withBorder padding="xs">
             <Stack gap={4}>
               {d.status === 'ready' ? (
-                <Image src={thumbUrl(d.id, 0)} alt="" h={110} fit="contain" />
+                <AssetImage src={thumbUrl(d.id, 0)} alt="" h={110} fit="contain" />
               ) : (
                 <Text size="xs" c="dimmed" h={110} ta="center" pt={45}>
                   {t(`document.status.${d.status}`)}

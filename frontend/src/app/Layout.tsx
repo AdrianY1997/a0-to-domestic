@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { Navigate, NavLink, Outlet, useLocation } from 'react-router';
 import { SESSION_KEY, logout, useAuthRequiredWatcher, useSession } from '../api/auth';
 import { useSyncPreferences } from '../api/settings';
+import { BootStatus } from '../components/BootStatus';
 import { LANGUAGES } from '../i18n';
 
 const NAV = [
@@ -117,6 +118,7 @@ export function Layout() {
         </Group>
       </AppShell.Header>
       <AppShell.Main>
+        <BootStatus />
         <Suspense
           fallback={
             <Center p="xl">

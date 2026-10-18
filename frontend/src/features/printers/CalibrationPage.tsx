@@ -17,6 +17,7 @@ import { usePapers, usePrinters } from '../../api/queries';
 import type { Margins } from '../../api/types';
 import { ErrorAlert } from '../../components/ErrorAlert';
 import { useAppStore } from '../../store/app';
+import { AssetLink } from '../../api/assets';
 import { calibratePrinter, calibrationPdfUrl } from './api';
 import { K_MAX, K_MIN, kInRange, nominalLengthsMm, scaleFactor } from './calibration';
 import { MarginsFields } from './MarginsFields';
@@ -107,7 +108,7 @@ export default function CalibrationPage() {
           <Text size="sm">{t('printers.cal.printHelp')}</Text>
           <Group>
             <Button
-              component="a"
+              component={AssetLink}
               href={calibrationPdfUrl(id, paperId, i18n.resolvedLanguage ?? 'es')}
               target="_blank"
               rel="noopener"
