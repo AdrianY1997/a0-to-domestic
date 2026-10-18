@@ -39,6 +39,14 @@ jobs:
           tags: a0td:dev
           cache-from: type=gha,scope=dev
           cache-to: type=gha,scope=dev,mode=max
+      - name: Generate fixtures (large ones are gitignored)
+        run: |
+          # Deterministic generator (same output as the committed small files). Mounted read-write and
+          # run as the runner UID, like the test step below.
+          docker run --rm --user "$(id -u):$(id -g)" \
+            -e HOME=/tmp/home -e XDG_CACHE_HOME=/tmp/cache \
+            -v "$PWD/fixtures:/app/fixtures" -v "$PWD/tools:/app/tools:ro" \
+            a0td:dev python /app/tools/make_fixtures.py --out /app/fixtures
       - name: Lint, types and tests
         run: |
           # The checkout belongs to the runner UID, not to the image's app (10001): run as the runner
@@ -179,6 +187,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
+      - name: Build the dev image (fixture generator)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile
+          target: dev
+          load: true
+          tags: a0td:dev
+          cache-from: type=gha,scope=dev
+      - name: Generate fixtures (large ones are gitignored)
+        run: |
+          # Written to ./fixtures on the host, which compose mounts read-only into the e2e container.
+          docker run --rm --user "$(id -u):$(id -g)" \
+            -e HOME=/tmp/home -e XDG_CACHE_HOME=/tmp/cache \
+            -v "$PWD/fixtures:/app/fixtures" -v "$PWD/tools:/app/tools:ro" \
+            a0td:dev python /app/tools/make_fixtures.py --out /app/fixtures
       - name: Playwright against the hardened full image
         run: |
           # The e2e named volume for node_modules is created root-owned; hand it to the runner UID first.

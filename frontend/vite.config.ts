@@ -17,7 +17,15 @@ function serviceWorker(): Plugin {
     name: 'a0td-service-worker',
     apply: 'build',
     generateBundle(_, bundle) {
-      if (!isLocal) return;
+      if (!isLocal) {
+        // Server builds ship no public/ (py/ is local-only), so the favicon is emitted on its own.
+        this.emitFile({
+          type: 'asset',
+          fileName: 'favicon.svg',
+          source: readFileSync(fileURLToPath(new URL('./public/favicon.svg', import.meta.url))),
+        });
+        return;
+      }
       const files = Object.keys(bundle).filter((f) => !f.endsWith('.map'));
       const precache = ['./', ...files];
       const buildId = createHash('sha1').update(files.join('|')).digest('hex').slice(0, 10);

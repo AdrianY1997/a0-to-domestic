@@ -251,7 +251,13 @@ Post-cierre (2026-10-17):
     - service worker;
     - HashRouter;
     - `.github/workflows/pages.yml`.
-  - Pendientes antes de publicar: 23 errores de mypy nuevos (numpy) y wiring de `ICC_IGNORED`/`LOCAL_LIMIT`.
+  - ✅ **Publicado en https://adriany1997.github.io/a0-to-domestic/** (commit `5ce2b15`, workflow `pages`).
+    Verificado por el orquestador en el sitio real:
+    - El motor arranca en unos 45 s en la primera visita.
+    - Un PDF A0 se planifica en 21 hojas y se descarga como un PDF de 22 páginas A4 apaisadas.
+    - Todo se procesa en el navegador.
+  - Verificación local: backend 964 + 59 tests con Pillow; frontend 231 en los dos modos; web smoke OK.
+  - CI: el backend falla porque no se generan los fixtures grandes (gitignored). Corrigiéndose, junto con el 404 del favicon.
 - Red de conversores endurecida (SPEC §14):
   - `office_sanitize.py`.
   - `unshare --net` automático si el seccomp lo permite.
