@@ -62,8 +62,10 @@ jobs:
               pytest -p no:cacheprovider -q --cov=a0td --cov-report=term-missing:skip-covered'
       - name: pip-audit
         run: |
+          # uv's cache lives under XDG_CACHE_HOME (/tmp/cache/uv), which the dev image owns as another
+          # user, so point uv at a fresh cache dir in /tmp instead.
           docker run --rm --user "$(id -u):$(id -g)" \
-            -e HOME=/tmp/home -e XDG_CACHE_HOME=/tmp/cache \
+            -e HOME=/tmp/home -e XDG_CACHE_HOME=/tmp/cache -e UV_CACHE_DIR=/tmp/uv-cache-ci \
             -v "$PWD/backend:/app/backend" -w /app/backend a0td:dev sh -c '
             uv export --frozen --no-dev --no-emit-project -o /tmp/requirements.txt >/dev/null &&
             uvx pip-audit --requirement /tmp/requirements.txt --no-deps --disable-pip'
