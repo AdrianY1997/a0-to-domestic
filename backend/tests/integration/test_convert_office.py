@@ -1,5 +1,7 @@
 """Office / ODF / metafile converter (LibreOffice) and its hardening (SPEC 7.1, 14, 15.5, 15.6)."""
 
+import os
+import time
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -9,7 +11,7 @@ from a0td.config import AppConfig
 from a0td.domain.errors import DomainError, ErrorCode, WarningCode
 from a0td.ingest import ingest_document
 from a0td.ingest.converters import office as office_mod
-from a0td.ingest.converters.base import ConvertContext, tool_available
+from a0td.ingest.converters.base import ConvertContext, run_tool, tool_available
 from a0td.ingest.converters.common import tool_env
 from a0td.ingest.converters.office import (
     OfficeConverter,
@@ -167,9 +169,20 @@ def test_each_job_uses_its_own_profile_and_cleans_scratch(
     assert not (work / ".work").exists()  # scratch (profile included) is removed after ingest
 
 
-@needs_lo
-def test_conversion_timeout_is_reported(fixtures_dir: Path, tmp_path: Path) -> None:
-    cfg = AppConfig(data_dir=tmp_path / "d", tmp_dir=tmp_path / "t", job_timeout_s=1)
+@pytest.mark.skipif(os.name != "posix", reason="process groups are POSIX-only")
+def test_conversion_timeout_is_reported(tmp_path: Path) -> None:
+    """A tool that outlives its budget raises CONVERSION_TIMEOUT and its whole group dies."""
+    pid_file = tmp_path / "child.pid"
+    script = f"sleep 30 & echo $! > {pid_file}; wait"
     with pytest.raises(DomainError) as exc:
-        ingest_document(fixture_path(fixtures_dir, "pptx_a0.pptx"), tmp_path / "doc", config=cfg)
-    assert exc.value.code in (ErrorCode.CONVERSION_TIMEOUT, ErrorCode.CONVERSION_FAILED)
+        run_tool(["sh", "-c", script], scratch=tmp_path / "scratch", timeout_s=1, no_network=False)
+    assert exc.value.code is ErrorCode.CONVERSION_TIMEOUT
+    child = int(pid_file.read_text().strip())
+    for _ in range(50):  # the grandchild must be gone (reaped by init or already dead)
+        try:
+            os.kill(child, 0)
+        except ProcessLookupError:
+            break
+        time.sleep(0.1)
+    else:
+        pytest.fail("child process survived the timeout")
